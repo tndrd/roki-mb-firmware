@@ -49,17 +49,17 @@ public:
 
 			uint8_t *ptr = dest.data();
 
-			*reinterpret_cast<uint16_t*>(ptr) = Orientation.X;
-			ptr += sizeof(uint16_t);
+			*reinterpret_cast<int16_t*>(ptr) = Orientation.X;
+			ptr += sizeof(int16_t);
 
-			*reinterpret_cast<uint16_t*>(ptr) = Orientation.Y;
-			ptr += sizeof(uint16_t);
+			*reinterpret_cast<int16_t*>(ptr) = Orientation.Y;
+			ptr += sizeof(int16_t);
 
-			*reinterpret_cast<uint16_t*>(ptr) = Orientation.Z;
-			ptr += sizeof(uint16_t);
+			*reinterpret_cast<int16_t*>(ptr) = Orientation.Z;
+			ptr += sizeof(int16_t);
 
-			*reinterpret_cast<uint16_t*>(ptr) = Orientation.W;
-			ptr += sizeof(uint16_t);
+			*reinterpret_cast<int16_t*>(ptr) = Orientation.W;
+			ptr += sizeof(int16_t);
 
 			*reinterpret_cast<float*>(ptr) = Orientation.Accuracy;
 			ptr += sizeof(float);
