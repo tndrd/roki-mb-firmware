@@ -28,7 +28,7 @@ public:
 		int16_t Z;
 		int16_t W;
 
-		float Accuracy;
+		//float Accuracy;
 	};
 
 	struct BHYTimestamp {
@@ -42,37 +42,11 @@ public:
 
 		uint8_t SensorId;
 
-		void SerializeTo(std::vector<uint8_t> &dest) {
-			dest.resize(
-					4 * sizeof(int16_t) + sizeof(float) + 2 * sizeof(uint32_t)
-							+ sizeof(uint8_t));
 
-			uint8_t *ptr = dest.data();
+		static constexpr size_t Size = 4 * sizeof(int16_t) + /* sizeof(float) + */ 2 * sizeof(uint32_t)
+		+ sizeof(uint8_t);
 
-			*reinterpret_cast<int16_t*>(ptr) = Orientation.X;
-			ptr += sizeof(int16_t);
-
-			*reinterpret_cast<int16_t*>(ptr) = Orientation.Y;
-			ptr += sizeof(int16_t);
-
-			*reinterpret_cast<int16_t*>(ptr) = Orientation.Z;
-			ptr += sizeof(int16_t);
-
-			*reinterpret_cast<int16_t*>(ptr) = Orientation.W;
-			ptr += sizeof(int16_t);
-
-			*reinterpret_cast<float*>(ptr) = Orientation.Accuracy;
-			ptr += sizeof(float);
-
-			*reinterpret_cast<uint32_t*>(ptr) = Timestamp.TimeS;
-			ptr += sizeof(uint32_t);
-
-			*reinterpret_cast<uint32_t*>(ptr) = Timestamp.TimeNS;
-			ptr += sizeof(uint32_t);
-
-			*reinterpret_cast<uint8_t*>(ptr) = SensorId;
-			ptr += sizeof(uint8_t);
-		}
+		void SerializeTo(uint8_t* dest, uint8_t* size);
 	};
 
 	BHYWrapper(SPI_HandleTypeDef *spiHandle);

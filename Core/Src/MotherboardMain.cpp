@@ -70,6 +70,14 @@ void MotherboardOnBodyTransmitComplete() {
 	mbctx.Body.ProcessResponces();
 }
 
+void MotherboardOnHeadRecieveComplete() {
+	mbctx.Head.ProcessRecievedData();
+}
+
+void MotherboardOnHeadTransmitComplete() {
+	mbctx.Head.FinishTransmit();
+}
+
 void MotherboardOnBodyTimerTick() {
 	mbctx.Body.ProcessRequests();
 }

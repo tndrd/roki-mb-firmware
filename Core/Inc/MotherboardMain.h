@@ -22,6 +22,8 @@ int MotherboardInit(struct MotherboardConfig conf);
 int MotherboardTick();
 void MotherboardOnStrobe();
 void MotherboardOnBodyTransmitComplete();
+void MotherboardOnHeadRecieveComplete();
+void MotherboardOnHeadTransmitComplete();
 void MotherboardOnBodyTimerTick();
 void MotherboardOnImuTimerTick();
 

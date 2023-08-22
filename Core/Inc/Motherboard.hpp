@@ -170,6 +170,8 @@ struct HeadInterface {
 	UART_HandleTypeDef *UartHandle;
 	size_t TimeoutS;
 
+	bool TransmitComplete = true;
+
 	HeadInterface() = default;
 
 	HeadInterface(UART_HandleTypeDef *uart, size_t timeoutS) :
@@ -187,6 +189,10 @@ struct HeadInterface {
 	}
 
 	void Send(const Responce &responce) {
+
+		while (!TransmitComplete) {
+		}
+
 		size_t size = responce.Data.size() + 3 + 3;
 		CurrentResponceBuffer.resize(size);
 
@@ -204,8 +210,12 @@ struct HeadInterface {
 
 		*ptr = SOM3Val;
 
-		HAL_UART_Transmit(UartHandle, CurrentResponceBuffer.data(),
-				CurrentResponceBuffer.size(), TimeoutS);
+		//ResetReadState();
+
+		TransmitComplete = false;
+
+		HAL_UART_Transmit_IT(UartHandle, CurrentResponceBuffer.data(),
+				CurrentResponceBuffer.size());
 	}
 
 	Request GetRequest() {
@@ -213,6 +223,10 @@ struct HeadInterface {
 		auto request = std::move(Requests.front());
 		Requests.pop();
 		return request;
+	}
+
+	void FinishTransmit() {
+		TransmitComplete = true;
 	}
 
 	void ProcessRecievedData() {
@@ -241,7 +255,7 @@ struct HeadInterface {
 		}
 		case ReadState::REQUEST_SIZE: {
 			RequestSize = CurrentValue;
-			CurrentRequest.Data.reserve(RequestSize);
+			CurrentRequest.Data.resize(RequestSize);
 			CurrentState = ReadState::RESPONCE_SIZE;
 			HAL_UART_Receive_IT(UartHandle, &CurrentValue, 1);
 			break;
@@ -307,11 +321,13 @@ public:
 	}
 
 	bool Get(size_t seq, BHYWrapper::BHYFrame &frame) const {
+		if (FrameQueue.empty())
+			return false;
 
 		if (seq < LastSeq || seq > FrameQueue.size() + LastSeq - 1)
 			return false;
 
-		auto imuFrame = FrameQueue[seq - LastSeq];
+		auto imuFrame = FrameQueue[(FrameQueue.size() - 1) - (seq - LastSeq)];
 		assert(imuFrame.Seq == seq);
 
 		frame = imuFrame;
@@ -335,12 +351,15 @@ public:
 		BHYWrapper::BHYFrame imuFrame;
 		bool ok = container.Get(frameSeq, imuFrame);
 
+		responce.Data.resize(BHYWrapper::BHYFrame::Size);
+
 		if (!ok) {
 			responce.Error = 1;
 			return responce;
 		}
 
-		imuFrame.SerializeTo(responce.Data);
+		uint8_t sz;
+		imuFrame.SerializeTo(responce.Data.data(), &sz);
 		responce.Error = 0;
 
 		return responce;

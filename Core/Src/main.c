@@ -107,6 +107,8 @@ int main(void) {
 	MX_DAC1_Init();
 	/* USER CODE BEGIN 2 */
 	HAL_DAC_SetValue(&hdac1, DAC1_CHANNEL_1, DAC_ALIGN_12B_R, 4095 * 1.8 / 3.3);
+	HAL_TIM_Base_Start_IT(&htim3);
+	HAL_TIM_Base_Start_IT(&htim2);
 
 	struct MotherboardConfig config;
 
@@ -119,6 +121,10 @@ int main(void) {
 	config.IMUSpi = &hspi1;
 
 	MotherboardInit(config);
+
+	MotherboardOnStrobe();
+	MotherboardOnStrobe();
+	MotherboardOnStrobe();
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -196,6 +202,26 @@ void HAL_COMP_TriggerCallback(COMP_HandleTypeDef *hcomp) {
 	if (hcomp->Instance == COMP2) {
 		MotherboardOnStrobe();
 	}
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+	if (huart->Instance == USART3) {
+		MotherboardOnHeadRecieveComplete();
+	}
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
+	if (huart->Instance == USART3) {
+		MotherboardOnHeadTransmitComplete();
+	}
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+	if (htim->Instance == TIM3)
+		MotherboardOnBodyTimerTick();
+
+	if (htim->Instance == TIM2)
+		MotherboardOnImuTimerTick();
 }
 
 /* USER CODE END 4 */
