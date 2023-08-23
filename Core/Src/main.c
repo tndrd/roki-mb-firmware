@@ -106,9 +106,11 @@ int main(void) {
 	MX_COMP2_Init();
 	MX_DAC1_Init();
 	/* USER CODE BEGIN 2 */
-	HAL_DAC_SetValue(&hdac1, DAC1_CHANNEL_1, DAC_ALIGN_12B_R, 4095 * 1.8 / 3.3);
+	HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
+	HAL_DAC_SetValue(&hdac1, DAC1_CHANNEL_1, DAC_ALIGN_12B_R, 4095 * (1 / 3.3));
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_TIM_Base_Start_IT(&htim2);
+	HAL_COMP_Start(&hcomp2);
 
 	struct MotherboardConfig config;
 
@@ -120,18 +122,16 @@ int main(void) {
 
 	config.IMUSpi = &hspi1;
 
-	MotherboardInit(config);
-
-	MotherboardOnStrobe();
-	MotherboardOnStrobe();
-	MotherboardOnStrobe();
+	if(!MotherboardInit(config))
+		return 1;
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		/* USER CODE END WHILE */
 		MotherboardTick();
+		/* USER CODE END WHILE */
+
 		/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */
@@ -250,6 +250,11 @@ void Error_Handler(void) {
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
+
+	uint8_t fileBuf[256];
+	strncpy(fileBuf, file, 256);
+
+	while(1) {}
   /* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */

@@ -7,6 +7,8 @@
 
 #include "BHYWrapper.hpp"
 
+static int test = 0;
+
 BHYWrapper::BHYWrapper(SPI_HandleTypeDef *spiHandle) :
 		SPIHandle { spiHandle } {
 	assert(spiHandle);
@@ -114,7 +116,7 @@ void BHYWrapper::ParseFrame(const bhy2_fifo_parse_data_info *cbInfo,
 		void *cbRef) {
 	BHYFrame *frame = reinterpret_cast<BHYFrame*>(cbRef);
 	bhy2_data_quaternion qtData;
-
+	test++;
 	assert(frame);
 	auto &timestamp = frame->Timestamp;
 	auto &quaternion = frame->Orientation;
