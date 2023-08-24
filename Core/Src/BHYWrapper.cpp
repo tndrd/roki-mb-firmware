@@ -101,7 +101,8 @@ bool BHYWrapper::Poll() {
 	bhy2_get_interrupt_status(&interruptStatus, &bhy2);
 
 	if (interruptStatus) {
-		bhy2_get_and_process_fifo(WorkBuffer.data(), WorkBuffer.size(), &bhy2);
+		assert(
+				bhy2_get_and_process_fifo(WorkBuffer.data(), WorkBuffer.size(), &bhy2) == BHY2_OK);
 		return true;
 	}
 
@@ -139,11 +140,11 @@ void BHYWrapper::ParseFrame(const bhy2_fifo_parse_data_info *cbInfo,
 	quaternion.Z = qtData.z;
 	quaternion.W = qtData.w;
 	/*
-	quaternion.Accuracy = ((qtData.accuracy * 180.0f) / 16384.0f)
-			/ 3.141592653589793f; */
+	 quaternion.Accuracy = ((qtData.accuracy * 180.0f) / 16384.0f)
+	 / 3.141592653589793f; */
 }
 
-void BHYWrapper::BHYFrame::SerializeTo(uint8_t* dest, uint8_t* size) {
+void BHYWrapper::BHYFrame::SerializeTo(uint8_t *dest, uint8_t *size) {
 	assert(dest);
 	assert(size);
 
@@ -162,9 +163,9 @@ void BHYWrapper::BHYFrame::SerializeTo(uint8_t* dest, uint8_t* size) {
 	ptr += sizeof(int16_t);
 
 	/*
-	*reinterpret_cast<float*>(ptr) = Orientation.Accuracy;
-	ptr += sizeof(float);
-	*/
+	 *reinterpret_cast<float*>(ptr) = Orientation.Accuracy;
+	 ptr += sizeof(float);
+	 */
 
 	*reinterpret_cast<uint32_t*>(ptr) = Timestamp.TimeS;
 	ptr += sizeof(uint32_t);
