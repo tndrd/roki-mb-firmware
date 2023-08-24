@@ -216,6 +216,9 @@ struct HeadInterface {
 
 		size_t sz = CurrentResponceBuffer.size();
 
+		uint8_t testBuf[64];
+		memcpy(testBuf, CurrentResponceBuffer.data(), sz);
+
 		HAL_UART_Transmit_IT(UartHandle, CurrentResponceBuffer.data(), sz);
 	}
 
@@ -441,7 +444,7 @@ private:
 	}
 
 	Responce GetLatestFrame(const Request &request,
-			const IMUFrameContainer &container) {
+			const BHYWrapper &IMU) {
 		assert(
 				RequestMode::Deserialize(request.MetaInfo)
 						== RequestMode::LatestFrame);
@@ -455,13 +458,7 @@ private:
 			responce.Error = ErrorCodes::BadRequest;
 		}
 
-		BHYWrapper::BHYFrame imuFrame;
-		bool ok = container.GetLast(imuFrame);
-
-		if (!ok) {
-			responce.Error = ErrorCodes::FrameUnavailable;
-			return responce;
-		}
+		BHYWrapper::BHYFrame imuFrame = IMU.GetFrame();
 
 		uint8_t sz;
 		imuFrame.SerializeTo(responce.Data.data(), &sz);
@@ -491,7 +488,7 @@ private:
 
 public:
 	Responce Handle(const Request &request,
-				IMUFrameContainer &container) {
+				IMUFrameContainer &container, const BHYWrapper& IMU) {
 		assert(request.PeripheryID == Periphery::Imu);
 
 		switch (RequestMode::Deserialize(request.MetaInfo)) {
@@ -500,7 +497,7 @@ public:
 		case RequestMode::Info:
 			return GetInfo(request, container);
 		case RequestMode::LatestFrame:
-			return GetLatestFrame(request, container);
+			return GetLatestFrame(request, IMU);
 		case RequestMode::Reset:
 					return DoReset(request, container);
 		default: assert(0 && "Unknown Mode");
