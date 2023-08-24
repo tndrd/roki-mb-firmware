@@ -50,8 +50,9 @@ Core/Src/IMU_funcs.o: ../Core/Src/IMU_funcs.cpp \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ioreq.h \
  ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc/usbd_ctlreq.h \
  ../Core/Inc/bhy2.h ../Core/Inc/bhy2_defs.h ../Core/Inc/bhy2_hif.h \
- ../Core/Inc/bhy2_parse.h ../Core/Inc/bhy2.h ../Core/Inc/IMU_funcs.h \
- ../Core/Inc/spi.h ../Core/Inc/main.h ../Core/Inc/i2c.h
+ ../Core/Inc/bhy2_parse.h ../Core/Inc/bhy2.h ../Core/Inc/bhy2_defs.h \
+ ../Core/Inc/IMU_funcs.h ../Core/Inc/spi.h ../Core/Inc/main.h \
+ ../Core/Inc/i2c.h
 ../USB_DEVICE/App/usb_device.h:
 ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7xx.h:
 ../Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h743xx.h:
@@ -108,6 +109,7 @@ Core/Src/IMU_funcs.o: ../Core/Src/IMU_funcs.cpp \
 ../Core/Inc/bhy2_hif.h:
 ../Core/Inc/bhy2_parse.h:
 ../Core/Inc/bhy2.h:
+../Core/Inc/bhy2_defs.h:
 ../Core/Inc/IMU_funcs.h:
 ../Core/Inc/spi.h:
 ../Core/Inc/main.h:

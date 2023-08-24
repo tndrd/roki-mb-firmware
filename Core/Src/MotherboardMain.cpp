@@ -50,7 +50,7 @@ int MotherboardTick() {
 		case Periphery::Imu:
 			mbctx.Head.Send(
 					mbctx.IMUHandler.Handle(request,
-							mbctx.FrameContainer));
+							mbctx.FrameContainer, mbctx.IMU));
 			break;
 		}
 	}

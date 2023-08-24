@@ -7,8 +7,6 @@
 
 #include "BHYWrapper.hpp"
 
-static int test = 0;
-
 BHYWrapper::BHYWrapper(SPI_HandleTypeDef *spiHandle) :
 		SPIHandle { spiHandle } {
 	assert(spiHandle);
@@ -26,7 +24,7 @@ int BHYWrapper::Init(float sampleRate, uint32_t reportLatency) {
 
 	spi_init(SPIHandle);
 
-	if (bhy2_init(BHY2_SPI_INTERFACE, &bhy2_spi_read, &bhy2_spi_write,
+	if (bhy2_init(BHY2_SPI_INTERFACE, bhy2_spi_read, bhy2_spi_write,
 			bhy2_delay_us, 64, NULL, &bhy2))
 		return 1;
 
@@ -117,7 +115,7 @@ void BHYWrapper::ParseFrame(const bhy2_fifo_parse_data_info *cbInfo,
 		void *cbRef) {
 	BHYFrame *frame = reinterpret_cast<BHYFrame*>(cbRef);
 	bhy2_data_quaternion qtData;
-	test++;
+
 	assert(frame);
 	auto &timestamp = frame->Timestamp;
 	auto &quaternion = frame->Orientation;
@@ -129,12 +127,10 @@ void BHYWrapper::ParseFrame(const bhy2_fifo_parse_data_info *cbInfo,
 
 	frame->SensorId = cbInfo->sensor_id;
 
-	uint32_t timeData = *cbInfo->time_stamp; /* Store the last timestamp */
-	timeData *= 15625;
+	uint64_t timeData = *cbInfo->time_stamp * 15625; /* Store the last timestamp */
 
 	timestamp.TimeS = (timeData / UINT64_C(1000000000));
 	timestamp.TimeNS = (timeData - (timestamp.TimeS * UINT64_C(1000000000)));
-
 	quaternion.X = qtData.x;
 	quaternion.Y = qtData.y;
 	quaternion.Z = qtData.z;
@@ -162,7 +158,7 @@ void BHYWrapper::BHYFrame::SerializeTo(uint8_t *dest, uint8_t *size) {
 	*reinterpret_cast<int16_t*>(ptr) = Orientation.W;
 	ptr += sizeof(int16_t);
 
-	/*
+	 /*
 	 *reinterpret_cast<float*>(ptr) = Orientation.Accuracy;
 	 ptr += sizeof(float);
 	 */

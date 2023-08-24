@@ -4,15 +4,18 @@
  *  Created on: 9 февр. 2022 г.
  *      Author: User
  */
+
 #include "usb_device.h"
 #include "main.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include "usbd_cdc_if.h"
 
+
 #include "bhy2.h"
 #include "bhy2_hif.h"
 #include "bhy2_parse.h"
+#include "bhy2_defs.h"
 
 #include "IMU_funcs.h"
 #include <stm32h7xx_hal.h>
@@ -27,7 +30,6 @@
 //Идентификатор сенсора (микросхема содержит кучу виртуальных сенсоров)
 #define QUAT_SENSOR_ID     BHY2_SENSOR_ID_GAMERV
 //Размер рабочего буфера
-#define BFY2_WORK_BUFFER_SIZE   1024
 
 //Ошибки обмена с imu
 #define IMU_ERR_OK   0
@@ -37,7 +39,7 @@
 I2C_HandleTypeDef *mI2c;        //!< Порт I2C, по которому осуществляется обмен
 uint8_t            mDevAddress; //!< Адрес устройства, с которым выполняется обмен
 
-SPI_HandleTypeDef  *mSPI;        //!< Порт SPI, по которому осуществляется обмен
+SPI_HandleTypeDef  *mSPI;       //!< Порт SPI, по которому осуществляется обмен
 
 
 void usbPrintf( const char *format, ... )
@@ -58,7 +60,6 @@ void spi_init( SPI_HandleTypeDef *hspi)
   mSPI = hspi;
 }
 
-
 //!
 //! \brief spiTransmit Передача с использованием канала DMA
 //! \param data        Данные для передачи
@@ -68,8 +69,9 @@ void spi_init( SPI_HandleTypeDef *hspi)
 int8_t spiTransmit( uint8_t *data, uint16_t size )
   {
   //Инициировать передачу по DMA
-  //HAL_I2C_Master_Transmit_DMA( mI2c, mDevAddress, data, size );
-	HAL_SPI_Transmit(mSPI, data, size, 10);
+	HAL_SPI_Transmit_DMA( mSPI, data, size );
+	while (HAL_SPI_GetState(mSPI) != HAL_SPI_STATE_READY);
+	//HAL_SPI_Transmit(mSPI, data, size, 5);
   //Возвращает истину при успешном завершении операции
   return mSPI->ErrorCode == HAL_SPI_ERROR_NONE;
   }
@@ -83,10 +85,10 @@ int8_t spiTransmit( uint8_t *data, uint16_t size )
 int8_t spiReceiv( uint8_t *data, uint16_t size )
   {
   //Инициировать передачу по DMA
-  //HAL_I2C_Master_Receive_DMA( mI2c, mDevAddress, data, size );
-	HAL_SPI_Receive(mSPI, data, size,  10);
-  //HAL_Delay(10);
+	//HAL_SPI_Receive(mSPI, data, size,  5);
+	HAL_SPI_Receive_DMA( mSPI, data, size );
   //Ожидать завершения приема
+	while (HAL_SPI_GetState(mSPI) != HAL_SPI_STATE_READY);
   //Возвращает истину при успешном завершении операции
   return mSPI->ErrorCode == HAL_SPI_ERROR_NONE;
   }
@@ -103,9 +105,9 @@ int8_t bhy2_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void 
   {
   //I2cDmaTransfer *i2cDmaTransfer = (I2cDmaTransfer*)intf_ptr;
   //Выставляем CS в 0
-  HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
-
-  reg_addr = reg_addr | 0x80;//записываем в старший бит адреса 1 для чтения данных
+  //HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
+  //GPIOA->BSRR = (uint32_t)SPI_CS_Pin << (16U);
+  GPIOE->BSRR = (uint32_t)IMU_CS_Pin << (16U);
 
   //Записываем адрес регистра
   if( !spiTransmit( &reg_addr, 1 ) )
@@ -115,12 +117,16 @@ int8_t bhy2_spi_read(uint8_t reg_addr, uint8_t *reg_data, uint32_t length, void 
   if( spiReceiv( reg_data, length ) )
   {
 	  //Выставляем CS в 1
-	  HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_SET);
+	  //SPI_CS_GPIO_Port->BSRR = (uint32_t)SPI_CS_Pin;
+	  IMU_CS_GPIO_Port->BSRR = (uint32_t)IMU_CS_Pin;
 	  //Возвращаем успех операции
     return IMU_ERR_OK;
   }
+  //SPI_CS_GPIO_Port->BSRR = (uint32_t)SPI_CS_Pin;
+  IMU_CS_GPIO_Port->BSRR = (uint32_t)IMU_CS_Pin;
   //Выставляем CS в 1
-  HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_SET);
+
+
   return IMU_ERR_SPI;
   }
 
@@ -143,19 +149,24 @@ int8_t bhy2_spi_write(uint8_t reg_addr, const uint8_t *reg_data, uint32_t length
 
   //I2cDmaTransfer *i2cDmaTransfer = (I2cDmaTransfer*)intf_ptr;
 
-  buffer[0] = reg_addr & 0x7F; //записываем в старший бит адреса 0 для записи данных
+  buffer[0] = reg_addr; //записываем в старший бит адреса 0 для записи данных
   //Скопировать данные из исходного буфера в промежуточный, чтобы адрес регистра был частью буфера данных
   memcpy( buffer + 1, reg_data, length );
+  //memcpy( buffer + 1, reg_data, length );
   //Выставляем CS в 0
-  HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
-  if( spiTransmit( buffer, length + 1 ) )
+  //GPIOA->BSRR = (uint32_t)SPI_CS_Pin << (16U);
+  GPIOE->BSRR = (uint32_t)IMU_CS_Pin << (16U);
+  //if( spiTransmit( buffer + 1, length + 1 ) )
+  if( spiTransmit( buffer, length + 1) )
   {
-    return IMU_ERR_OK;
 	  //Выставляем CS в 1
-	  HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_SET);
+	  //SPI_CS_GPIO_Port->BSRR = (uint32_t)SPI_CS_Pin;
+	  IMU_CS_GPIO_Port->BSRR = (uint32_t)IMU_CS_Pin;
+	  return IMU_ERR_OK;
   }
   //Выставляем CS в 1
-  HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_SET);
+  //SPI_CS_GPIO_Port->BSRR = (uint32_t)SPI_CS_Pin;
+  IMU_CS_GPIO_Port->BSRR = (uint32_t)IMU_CS_Pin;
   return IMU_ERR_I2C;
   }
 
@@ -169,6 +180,12 @@ void i2c_init( I2C_HandleTypeDef *hi2c, uint8_t devAddr )
   mDevAddress = devAddr;
 }
 
+uint8_t summir(uint8_t a, uint8_t b)
+{
+
+return a+b;
+}
+
 //!
 //! \brief i2cTransmit Передача с использованием канала DMA
 //! \param data        Данные для передачи
@@ -178,9 +195,9 @@ void i2c_init( I2C_HandleTypeDef *hi2c, uint8_t devAddr )
 int8_t i2cTransmit( uint8_t *data, uint16_t size )
   {
   //Инициировать передачу по DMA
-  //HAL_I2C_Master_Transmit_DMA( mI2c, mDevAddress, data, size );
-  HAL_I2C_Master_Transmit(mI2c, mDevAddress, data, size, 10);
-  //while (HAL_I2C_GetState(mI2c) != HAL_I2C_STATE_READY);
+  HAL_I2C_Master_Transmit_DMA( mI2c, mDevAddress, data, size );
+  //HAL_I2C_Master_Transmit(mI2c, mDevAddress, data, size, 10);
+  while (HAL_I2C_GetState(mI2c) != HAL_I2C_STATE_READY);
   //Возвращает истину при успешном завершении операции
   return mI2c->ErrorCode == HAL_I2C_ERROR_NONE;
   }
@@ -195,10 +212,10 @@ int8_t i2cTransmit( uint8_t *data, uint16_t size )
 int8_t i2cReceiv( uint8_t *data, uint16_t size )
   {
   //Инициировать передачу по DMA
-  //HAL_I2C_Master_Receive_DMA( mI2c, mDevAddress, data, size );
-  HAL_I2C_Master_Receive(mI2c, mDevAddress, data, size,  10);
+  HAL_I2C_Master_Receive_DMA( mI2c, mDevAddress, data, size );
+  //HAL_I2C_Master_Receive(mI2c, mDevAddress, data, size,  10);
   //Ожидать завершения приема
-  //while (HAL_I2C_GetState(mI2c) != HAL_I2C_STATE_READY);
+  while (HAL_I2C_GetState(mI2c) != HAL_I2C_STATE_READY);
   //Возвращает истину при успешном завершении операции
   return mI2c->ErrorCode == HAL_I2C_ERROR_NONE;
   }
@@ -277,9 +294,6 @@ void bhy2_delay_us(uint32_t us, void *private_data)
       }
     }
   }
-
-
-
 
 
 

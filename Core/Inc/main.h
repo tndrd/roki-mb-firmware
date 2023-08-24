@@ -59,8 +59,6 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define CAM_SYNC_Pin GPIO_PIN_0
 #define CAM_SYNC_GPIO_Port GPIOC
-#define SPI_CS_Pin GPIO_PIN_4
-#define SPI_CS_GPIO_Port GPIOA
 #define IMU_CS_Pin GPIO_PIN_15
 #define IMU_CS_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
