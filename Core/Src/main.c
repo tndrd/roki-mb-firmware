@@ -122,7 +122,7 @@ int main(void) {
 
 	config.IMUSpi = &hspi1;
 
-	if(!MotherboardInit(config))
+	if(MotherboardInit(config))
 		return 1;
 	/* USER CODE END 2 */
 
