@@ -49,19 +49,30 @@ struct QueueSender {
 	std::deque<Request> Requests;
 	std::queue<Responce> Responces;
 
+	Request PriorityRequest;
+	bool HasPriorityRequest = false;
+
 	bool WaitResponce = false;
 	std::vector<uint8_t> CurrentResponceBuffer;
 
 	struct MessageMode final {
-		static constexpr uint8_t Forward = 0;
-		static constexpr uint8_t Ignore = 1;
-		static constexpr uint8_t Notify = 2;
-		static constexpr uint8_t Priority = 3;
+		using Type = uint8_t;
+		static constexpr Type Sync = 0;
+		static constexpr Type Async = 1;
+
+		static uint8_t Serialize(Type mode) { return mode; }
+		static Type Deserialize(uint8_t val) { return val; }
 	};
 
-	using MessageModeT = uint8_t;
+	struct ErrorCode final {
+		using Type = uint8_t;
+		static constexpr Type Success = 0;
+		static constexpr Type Timeout = 1;
+		static constexpr Type Unknown = 2;
 
-	MessageModeT CurrentRequestMode;
+		static uint8_t Serialize(Type error) { return error; }
+		static Type Deserialize(uint8_t val) { return val; }
+	};
 
 	UART_HandleTypeDef *UartHandle;
 
@@ -74,23 +85,20 @@ struct QueueSender {
 		assert(uart != NULL);
 	}
 
-	MessageModeT GetMessageMode(const Request &request) {
-		return request.MetaInfo;
-	}
-
-	void SetMessageMode(Responce &responce, MessageModeT mode) {
-		responce.MetaInfo = mode;
-	}
-
 	void AddRequest(Request &&request) {
-		switch (GetMessageMode(request)) {
-		case MessageMode::Forward:
-		case MessageMode::Ignore:
-		case MessageMode::Notify:
+		switch (MessageMode::Deserialize(request.MetaInfo)) {
+		case MessageMode::Async:
 			Requests.emplace_back(std::move(request));
 			break;
-		case MessageMode::Priority:
-			Requests.emplace_front(std::move(request));
+		case MessageMode::Sync:
+			if (!HasPriorityRequest) {
+				PriorityRequest = std::move(request);
+				HasPriorityRequest = true;
+
+				if (Requests.empty()) {
+					ProcessPriorityRequest();
+				}
+			}
 			break;
 		}
 	}
@@ -99,6 +107,7 @@ struct QueueSender {
 		return !Responces.empty();
 	}
 
+
 	Responce GetResponce() {
 		assert(HasResponce());
 		auto responce = std::move(Responces.front());
@@ -106,43 +115,81 @@ struct QueueSender {
 		return responce;
 	}
 
+	void ProcessPriorityRequest() {
+		__disable_irq();
+		if (HasPriorityRequest && !WaitResponce) {
+			HasPriorityRequest = false;
+			WaitResponce = true;
+			__enable_irq();
+
+			auto &request = PriorityRequest;
+			auto &data = request.Data;
+
+			assert(MessageMode::Deserialize(request.MetaInfo) == MessageMode::Sync);
+
+
+
+			CurrentResponceBuffer.resize(request.ResponceSize);
+			HAL_UART_Transmit(UartHandle, data.data(), data.size(), TimeoutS);
+
+			HAL_StatusTypeDef ret = HAL_UART_Receive(UartHandle, CurrentResponceBuffer.data(),
+					CurrentResponceBuffer.size(), TimeoutS);
+			WaitResponce = false;
+
+			ErrorCode::Type error;
+
+			if (ret == HAL_OK)
+				error = ErrorCode::Success;
+			else if (ret == HAL_TIMEOUT)
+				error = ErrorCode::Timeout;
+			else
+				error = ErrorCode::Unknown;
+
+			Responces.emplace(
+					CreateResponce(CurrentResponceBuffer, MessageMode::Sync, error));
+		}
+		else {
+			__enable_irq();
+		}
+	}
+
 	void ProcessRequests() {
+		__disable_irq();
 		if (!Requests.empty() && !WaitResponce) {
+			WaitResponce = true;
+			__enable_irq();
+
 			auto &request = Requests.front();
 			auto &data = request.Data;
 
-			if (GetMessageMode(request) == MessageMode::Notify) {
-				Responces.emplace(CreateResponce( { }, MessageMode::Notify));
-				return;
-			}
+			assert(MessageMode::Deserialize(request.MetaInfo) == MessageMode::Async);
+
 
 			CurrentResponceBuffer.resize(request.ResponceSize);
-			CurrentRequestMode = GetMessageMode(request);
-			WaitResponce = true;
 
 			HAL_UART_Receive_IT(UartHandle, CurrentResponceBuffer.data(),
-					CurrentResponceBuffer.size());
+											CurrentResponceBuffer.size());
 			HAL_UART_Transmit(UartHandle, data.data(), data.size(), TimeoutS);
 
+
 			Requests.pop_front();
+		}
+		else {
+			__enable_irq();
 		}
 	}
 
 	Responce CreateResponce(const std::vector<uint8_t> &data,
-			MessageModeT messageMode) {
+			MessageMode::Type messageMode, ErrorCode::Type error) {
 		Responce responce;
 		responce.Data = data;
 		responce.PeripheryID = Periphery::Body;
-		responce.Error = 0;
-		SetMessageMode(responce, messageMode);
+		responce.Error = ErrorCode::Serialize(error);
+		responce.MetaInfo = MessageMode::Serialize(messageMode);
 		return responce;
 	}
 
 	void ProcessResponces() {
-		if (CurrentRequestMode != MessageMode::Ignore) {
-			Responces.emplace(
-					CreateResponce(CurrentResponceBuffer, CurrentRequestMode));
-		}
 		WaitResponce = false;
 	}
 };
@@ -219,7 +266,8 @@ struct HeadInterface {
 		uint8_t testBuf[64];
 		memcpy(testBuf, CurrentResponceBuffer.data(), sz);
 
-		HAL_UART_Transmit_IT(UartHandle, CurrentResponceBuffer.data(), sz);
+		auto ret = HAL_UART_Transmit_IT(UartHandle, CurrentResponceBuffer.data(), sz);
+		auto t = ret;
 	}
 
 	Request GetRequest() {
@@ -443,8 +491,7 @@ private:
 		return responce;
 	}
 
-	Responce GetLatestFrame(const Request &request,
-			const BHYWrapper &IMU) {
+	Responce GetLatestFrame(const Request &request, const BHYWrapper &IMU) {
 		assert(
 				RequestMode::Deserialize(request.MetaInfo)
 						== RequestMode::LatestFrame);
@@ -467,9 +514,10 @@ private:
 		return responce;
 	}
 
-	Responce DoReset(const Request &request,
-			IMUFrameContainer &container) {
-		assert(RequestMode::Deserialize(request.MetaInfo) == RequestMode::Reset);
+	Responce DoReset(const Request &request, IMUFrameContainer &container) {
+		assert(
+				RequestMode::Deserialize(request.MetaInfo)
+						== RequestMode::Reset);
 
 		Responce responce;
 		responce.PeripheryID = Periphery::Imu;
@@ -487,8 +535,8 @@ private:
 	}
 
 public:
-	Responce Handle(const Request &request,
-				IMUFrameContainer &container, const BHYWrapper& IMU) {
+	Responce Handle(const Request &request, IMUFrameContainer &container,
+			const BHYWrapper &IMU) {
 		assert(request.PeripheryID == Periphery::Imu);
 
 		switch (RequestMode::Deserialize(request.MetaInfo)) {
@@ -499,8 +547,9 @@ public:
 		case RequestMode::LatestFrame:
 			return GetLatestFrame(request, IMU);
 		case RequestMode::Reset:
-					return DoReset(request, container);
-		default: assert(0 && "Unknown Mode");
+			return DoReset(request, container);
+		default:
+			assert(0 && "Unknown Mode");
 		}
 	}
 };

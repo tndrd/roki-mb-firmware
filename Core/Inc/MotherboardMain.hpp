@@ -9,8 +9,10 @@
 #include "spi.h"
 
 struct MotherboardConfig {
-	UART_HandleTypeDef *HeadUart;
+	UART_HandleTypeDef *HeadServiceUart;
+	UART_HandleTypeDef *HeadStreamUart;
 	size_t HeadTimeout;
+
 
 	UART_HandleTypeDef *BodyUart;
 	size_t BodyTimeout;
@@ -22,9 +24,11 @@ extern "C" {
 int MotherboardInit(struct MotherboardConfig conf);
 int MotherboardTick();
 void MotherboardOnStrobe();
-void MotherboardOnBodyTransmitComplete();
-void MotherboardOnHeadRecieveComplete();
-void MotherboardOnHeadTransmitComplete();
+void MotherboardOnBodyRecieveComplete();
+void MotherboardOnHeadServiceRecieveComplete();
+void MotherboardOnHeadStreamRecieveComplete();
+void MotherboardOnHeadServiceTransmitComplete();
+void MotherboardOnHeadStreamTransmitComplete();
 void MotherboardOnBodyTimerTick();
 void MotherboardOnImuTimerTick();
 }

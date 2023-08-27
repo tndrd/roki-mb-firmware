@@ -9,7 +9,9 @@
 #include "Motherboard.hpp"
 
 struct MotherboardContext {
-	HeadInterface Head;
+	HeadInterface HeadService;
+	HeadInterface HeadStream;
+
 	QueueSender Body;
 	IMUFrameContainer FrameContainer;
 	BHYWrapper IMU;
@@ -18,7 +20,8 @@ struct MotherboardContext {
 	bool UpdateIMU = false;
 
 	MotherboardContext(MotherboardConfig conf) :
-		Head{conf.HeadUart, conf.HeadTimeout},
+		HeadService{conf.HeadServiceUart, conf.HeadTimeout},
+		HeadStream{conf.HeadStreamUart, conf.HeadTimeout},
 		Body{conf.BodyUart, conf.BodyTimeout},
 		FrameContainer{},
 		IMU{conf.IMUSpi},
@@ -32,7 +35,8 @@ static MotherboardContext mbctx;
 int MotherboardInit(MotherboardConfig conf) {
 	mbctx = MotherboardContext { conf };
 
-	mbctx.Head.ResetReadState();
+	mbctx.HeadService.ResetReadState();
+	mbctx.HeadStream.ResetReadState();
 	return mbctx.IMU.Init(800, 0);
 }
 
@@ -40,23 +44,33 @@ int MotherboardTick() {
 	if (mbctx.UpdateIMU)
 		mbctx.UpdateIMU = !mbctx.IMU.Poll();
 
-	if (mbctx.Head.HasRequest()) {
-		auto request = mbctx.Head.GetRequest();
+	if (mbctx.HeadService.HasRequest()) {
+		auto request = mbctx.HeadService.GetRequest();
 
 		switch (request.PeripheryID) {
 		case Periphery::Body:
 			mbctx.Body.AddRequest(std::move(request));
 			break;
 		case Periphery::Imu:
-			mbctx.Head.Send(
+			mbctx.HeadService.Send(
 					mbctx.IMUHandler.Handle(request,
 							mbctx.FrameContainer, mbctx.IMU));
 			break;
 		}
 	}
 
+	if (mbctx.HeadStream.HasRequest()) {
+			auto request = mbctx.HeadService.GetRequest();
+
+			switch (request.PeripheryID) {
+			case Periphery::Body:
+				mbctx.Body.AddRequest(std::move(request));
+				break;
+			}
+		}
+
 	if (mbctx.Body.HasResponce()) {
-		mbctx.Head.Send(mbctx.Body.GetResponce());
+		mbctx.HeadService.Send(mbctx.Body.GetResponce());
 	}
 
 	return 0;
@@ -66,19 +80,28 @@ void MotherboardOnStrobe() {
 	mbctx.FrameContainer.Add(mbctx.IMU.GetFrame());
 }
 
-void MotherboardOnBodyTransmitComplete() {
+void MotherboardOnBodyRecieveComplete() {
 	mbctx.Body.ProcessResponces();
 }
 
-void MotherboardOnHeadRecieveComplete() {
-	mbctx.Head.ProcessRecievedData();
+void MotherboardOnHeadServiceRecieveComplete() {
+	mbctx.HeadService.ProcessRecievedData();
 }
 
-void MotherboardOnHeadTransmitComplete() {
-	mbctx.Head.FinishTransmit();
+void MotherboardOnHeadStreamRecieveComplete() {
+	mbctx.HeadStream.ProcessRecievedData();
+}
+
+void MotherboardOnHeadServiceTransmitComplete() {
+	mbctx.HeadService.FinishTransmit();
+}
+
+void MotherboardOnHeadStreamTransmitComplete() {
+	mbctx.HeadStream.FinishTransmit();
 }
 
 void MotherboardOnBodyTimerTick() {
+	mbctx.Body.ProcessPriorityRequest();
 	mbctx.Body.ProcessRequests();
 }
 
