@@ -17,6 +17,8 @@ struct MotherboardContext {
 	BHYWrapper IMU;
 	IMURequestHandler IMUHandler;
 
+	//SystemStateFactory SysState;
+
 	bool UpdateIMU = false;
 
 	MotherboardContext(MotherboardConfig conf) :
@@ -58,16 +60,6 @@ int MotherboardTick() {
 			break;
 		}
 	}
-
-	if (mbctx.HeadStream.HasRequest()) {
-			auto request = mbctx.HeadService.GetRequest();
-
-			switch (request.PeripheryID) {
-			case Periphery::Body:
-				mbctx.Body.AddRequest(std::move(request));
-				break;
-			}
-		}
 
 	if (mbctx.Body.HasResponce()) {
 		mbctx.HeadService.Send(mbctx.Body.GetResponce());

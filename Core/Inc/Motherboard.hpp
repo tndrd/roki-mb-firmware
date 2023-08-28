@@ -29,6 +29,7 @@
 struct Periphery {
 	static const uint8_t Body = 0;
 	static const uint8_t Imu = 1;
+	static const uint8_t Global = 2;
 };
 
 struct Request {
@@ -46,6 +47,7 @@ struct Responce {
 };
 
 struct QueueSender {
+private:
 	std::deque<Request> Requests;
 	std::queue<Responce> Responces;
 
@@ -59,9 +61,14 @@ struct QueueSender {
 		using Type = uint8_t;
 		static constexpr Type Sync = 0;
 		static constexpr Type Async = 1;
+		static constexpr Type Info = 2;
 
-		static uint8_t Serialize(Type mode) { return mode; }
-		static Type Deserialize(uint8_t val) { return val; }
+		static uint8_t Serialize(Type mode) {
+			return mode;
+		}
+		static Type Deserialize(uint8_t val) {
+			return val;
+		}
 	};
 
 	struct ErrorCode final {
@@ -70,14 +77,37 @@ struct QueueSender {
 		static constexpr Type Timeout = 1;
 		static constexpr Type Unknown = 2;
 
-		static uint8_t Serialize(Type error) { return error; }
-		static Type Deserialize(uint8_t val) { return val; }
+		static uint8_t Serialize(Type error) {
+			return error;
+		}
+		static Type Deserialize(uint8_t val) {
+			return val;
+		}
 	};
 
 	UART_HandleTypeDef *UartHandle;
 
 	size_t TimeoutS;
+public:
+	struct Info {
+		uint16_t NumRequests;
+		uint16_t NumResponces;
 
+		static constexpr size_t Size = 2 * sizeof(uint16_t);
+
+		void SerializeTo(uint8_t **ptr) {
+			assert(ptr);
+			assert(*ptr);
+
+			*reinterpret_cast<uint16_t*>(*ptr) = NumRequests;
+			*ptr += sizeof(uint16_t);
+
+			*reinterpret_cast<uint16_t*>(*ptr) = NumResponces;
+			*ptr += sizeof(uint16_t);
+		}
+	};
+
+public:
 	QueueSender() = default;
 
 	QueueSender(UART_HandleTypeDef *uart, size_t timeoutS) :
@@ -100,13 +130,16 @@ struct QueueSender {
 				}
 			}
 			break;
+
+		case MessageMode::Info:
+			Responces.emplace(CreateInfoResponce());
+			break;
 		}
 	}
 
 	bool HasResponce() const {
 		return !Responces.empty();
 	}
-
 
 	Responce GetResponce() {
 		assert(HasResponce());
@@ -125,15 +158,16 @@ struct QueueSender {
 			auto &request = PriorityRequest;
 			auto &data = request.Data;
 
-			assert(MessageMode::Deserialize(request.MetaInfo) == MessageMode::Sync);
-
-
+			assert(
+					MessageMode::Deserialize(request.MetaInfo)
+							== MessageMode::Sync);
 
 			CurrentResponceBuffer.resize(request.ResponceSize);
 			HAL_UART_Transmit(UartHandle, data.data(), data.size(), TimeoutS);
 
-			HAL_StatusTypeDef ret = HAL_UART_Receive(UartHandle, CurrentResponceBuffer.data(),
-					CurrentResponceBuffer.size(), TimeoutS);
+			HAL_StatusTypeDef ret = HAL_UART_Receive(UartHandle,
+					CurrentResponceBuffer.data(), CurrentResponceBuffer.size(),
+					TimeoutS);
 			WaitResponce = false;
 
 			ErrorCode::Type error;
@@ -146,9 +180,9 @@ struct QueueSender {
 				error = ErrorCode::Unknown;
 
 			Responces.emplace(
-					CreateResponce(CurrentResponceBuffer, MessageMode::Sync, error));
-		}
-		else {
+					CreateResponce(CurrentResponceBuffer, MessageMode::Sync,
+							error));
+		} else {
 			__enable_irq();
 		}
 	}
@@ -162,25 +196,24 @@ struct QueueSender {
 			auto &request = Requests.front();
 			auto &data = request.Data;
 
-			assert(MessageMode::Deserialize(request.MetaInfo) == MessageMode::Async);
-
+			assert(
+					MessageMode::Deserialize(request.MetaInfo)
+							== MessageMode::Async);
 
 			CurrentResponceBuffer.resize(request.ResponceSize);
 
 			HAL_UART_Receive_IT(UartHandle, CurrentResponceBuffer.data(),
-											CurrentResponceBuffer.size());
+					CurrentResponceBuffer.size());
 			HAL_UART_Transmit(UartHandle, data.data(), data.size(), TimeoutS);
 
-
 			Requests.pop_front();
-		}
-		else {
+		} else {
 			__enable_irq();
 		}
 	}
 
 	Responce CreateResponce(const std::vector<uint8_t> &data,
-			MessageMode::Type messageMode, ErrorCode::Type error) {
+			MessageMode::Type messageMode, ErrorCode::Type error) const {
 		Responce responce;
 		responce.Data = data;
 		responce.PeripheryID = Periphery::Body;
@@ -189,8 +222,22 @@ struct QueueSender {
 		return responce;
 	}
 
+	Responce CreateInfoResponce() const {
+		std::vector<uint8_t> data;
+		data.resize(Info::Size);
+
+		uint8_t *ptr = data.data();
+		GetInfo().SerializeTo(&ptr);
+
+		return CreateResponce(data, MessageMode::Info, ErrorCode::Success);
+	}
+
 	void ProcessResponces() {
 		WaitResponce = false;
+	}
+
+	Info GetInfo() const {
+		return {Requests.size(), Responces.size()};
 	}
 };
 
@@ -266,7 +313,9 @@ struct HeadInterface {
 		uint8_t testBuf[64];
 		memcpy(testBuf, CurrentResponceBuffer.data(), sz);
 
-		auto ret = HAL_UART_Transmit_IT(UartHandle, CurrentResponceBuffer.data(), sz);
+		auto ret = HAL_UART_Transmit(UartHandle, CurrentResponceBuffer.data(),
+				sz, TimeoutS);
+		TransmitComplete = true;
 		auto t = ret;
 	}
 
@@ -344,25 +393,34 @@ struct HeadInterface {
 	}
 };
 
-struct IMUFrame: public BHYWrapper::BHYFrame {
-	size_t Seq;
-
-	IMUFrame(const BHYWrapper::BHYFrame &frame, size_t seq) :
-			BHYFrame { frame }, Seq { seq } {
-	}
-};
+using IMUFrame = BHYWrapper::BHYFrame;
 
 class IMUFrameContainer {
 	std::deque<IMUFrame> FrameQueue;
 	size_t FirstSeq = 0;
 
-	size_t TestSeq = 0;
+	size_t MaxFrames = 300;
 public:
 	struct Info {
 		uint16_t First;
 		uint16_t NumAv;
+		uint16_t MaxFrames;
 
-		static constexpr size_t Size = 2 * sizeof(uint16_t);
+		static constexpr size_t Size = 3 * sizeof(uint16_t);
+
+		void SerializeTo(uint8_t **ptr) {
+			assert(ptr);
+			assert(*ptr);
+
+			*reinterpret_cast<uint16_t*>(*ptr) = First;
+			*ptr += sizeof(uint16_t);
+
+			*reinterpret_cast<uint16_t*>(*ptr) = NumAv;
+			*ptr += sizeof(uint16_t);
+
+			*reinterpret_cast<uint16_t*>(*ptr) = MaxFrames;
+			*ptr += sizeof(uint16_t);
+		}
 	};
 
 public:
@@ -372,7 +430,7 @@ public:
 	}
 
 	void Add(const BHYWrapper::BHYFrame &frame) {
-		FrameQueue.push_front( { frame, TestSeq++ });
+		FrameQueue.push_front(frame);
 	}
 
 	void Remove() {
@@ -401,7 +459,7 @@ public:
 	}
 
 	Info GetInfo() const {
-		return {FirstSeq, FrameQueue.size()};
+		return {FirstSeq, FrameQueue.size(), MaxFrames};
 	}
 };
 
@@ -480,11 +538,7 @@ private:
 		uint8_t *ptr = responce.Data.data();
 		auto info = container.GetInfo();
 
-		*reinterpret_cast<uint16_t*>(ptr) = info.First;
-		ptr += sizeof(uint16_t);
-
-		*reinterpret_cast<uint16_t*>(ptr) = info.NumAv;
-		ptr += sizeof(uint16_t);
+		info.SerializeTo(&ptr);
 
 		responce.Error = ErrorCodes::Success;
 
@@ -509,6 +563,7 @@ private:
 
 		uint8_t sz;
 		imuFrame.SerializeTo(responce.Data.data(), &sz);
+
 		responce.Error = ErrorCodes::Success;
 
 		return responce;
@@ -553,3 +608,34 @@ public:
 		}
 	}
 };
+
+/*
+ class SystemStateFactory {
+ public:
+ Responce GetSystemState(const QueueSender &qs,
+ const IMUFrameContainer &imuCont, const BHYWrapper &imu) {
+ auto qsInfo = qs.GetInfo();
+ auto imuInfo = imuCont.GetInfo();
+ auto lastFr = imu.GetFrame();
+
+ Responce responce;
+
+ responce.Error = 0;
+ responce.PeripheryID = Periphery::Global;
+ responce.MetaInfo = 0;
+ responce.Data.resize(
+ QueueSender::Info::Size + IMUFrameContainer::Info::Size
+ + BHYWrapper::BHYFrame::Size);
+
+ uint8_t *ptr = responce.Data.data();
+
+ qsInfo.SerializeTo(&ptr);
+ imuInfo.SerializeTo(&ptr);
+
+ uint8_t sz;
+ lastFr.SerializeTo(ptr, &sz);
+
+ return responce;
+ }
+ };
+ */

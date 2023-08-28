@@ -66,6 +66,7 @@ void I2C2_EV_IRQHandler(void);
 void I2C2_ER_IRQHandler(void);
 void SPI1_IRQHandler(void);
 void USART3_IRQHandler(void);
+void UART4_IRQHandler(void);
 void UART8_IRQHandler(void);
 void OTG_FS_EP1_OUT_IRQHandler(void);
 void OTG_FS_IRQHandler(void);
