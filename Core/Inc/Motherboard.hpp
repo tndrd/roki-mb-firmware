@@ -431,6 +431,8 @@ public:
 
 	void Add(const BHYWrapper::BHYFrame &frame) {
 		FrameQueue.push_front(frame);
+		if (FrameQueue.size() > MaxFrames)
+			Remove();
 	}
 
 	void Remove() {
