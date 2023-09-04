@@ -71,7 +71,7 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+	SCB->VTOR = (FLASH_BASE | 0x20000);
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -124,6 +124,9 @@ int main(void)
 	config.BodyTimeout = 10;
 
 	config.IMUSpi = &hspi1;
+
+	config.VersionMajor = 0;
+	config.VersionMinor = 1;
 
 	if (MotherboardInit(config))
 		return 1;

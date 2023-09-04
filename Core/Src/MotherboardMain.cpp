@@ -12,22 +12,22 @@ struct MotherboardContext {
 	HeadInterface HeadService;
 	HeadInterface HeadStream;
 
+	AcknowledgeHandler AckHandler {0, 0};
+
 	QueueSender Body;
 	IMUFrameContainer FrameContainer;
 	BHYWrapper IMU;
 	IMURequestHandler IMUHandler;
 
-	//SystemStateFactory SysState;
-
 	bool UpdateIMU = false;
 
 	MotherboardContext(MotherboardConfig conf) :
-		HeadService{conf.HeadServiceUart, conf.HeadTimeout},
-		HeadStream{conf.HeadStreamUart, conf.HeadTimeout},
-		Body{conf.BodyUart, conf.BodyTimeout},
-		FrameContainer{},
-		IMU{conf.IMUSpi},
-		IMUHandler{} {}
+			HeadService { conf.HeadServiceUart, conf.HeadTimeout }, HeadStream {
+					conf.HeadStreamUart, conf.HeadTimeout }, Body {
+					conf.BodyUart, conf.BodyTimeout }, FrameContainer { }, IMU {
+					conf.IMUSpi }, IMUHandler { }, AckHandler {
+					conf.VersionMajor, conf.VersionMinor } {
+	}
 
 	MotherboardContext() = default;
 };
@@ -50,13 +50,17 @@ int MotherboardTick() {
 		auto request = mbctx.HeadService.GetRequest();
 
 		switch (request.PeripheryID) {
+		case Periphery::Ack:
+			mbctx.HeadService.Send(mbctx.AckHandler.Handle(request));
+			break;
+
 		case Periphery::Body:
 			mbctx.Body.AddRequest(std::move(request));
 			break;
 		case Periphery::Imu:
 			mbctx.HeadService.Send(
-					mbctx.IMUHandler.Handle(request,
-							mbctx.FrameContainer, mbctx.IMU));
+					mbctx.IMUHandler.Handle(request, mbctx.FrameContainer,
+							mbctx.IMU));
 			break;
 		}
 	}

@@ -29,7 +29,7 @@
 struct Periphery {
 	static const uint8_t Body = 0;
 	static const uint8_t Imu = 1;
-	static const uint8_t Global = 2;
+	static const uint8_t Ack = 2;
 };
 
 struct Request {
@@ -168,7 +168,6 @@ public:
 			HAL_StatusTypeDef ret = HAL_UART_Receive(UartHandle,
 					CurrentResponceBuffer.data(), CurrentResponceBuffer.size(),
 					TimeoutS);
-			WaitResponce = false;
 
 			ErrorCode::Type error;
 
@@ -182,6 +181,8 @@ public:
 			Responces.emplace(
 					CreateResponce(CurrentResponceBuffer, MessageMode::Sync,
 							error));
+
+			WaitResponce = false;
 		} else {
 			__enable_irq();
 		}
@@ -611,33 +612,75 @@ public:
 	}
 };
 
-/*
- class SystemStateFactory {
- public:
- Responce GetSystemState(const QueueSender &qs,
- const IMUFrameContainer &imuCont, const BHYWrapper &imu) {
- auto qsInfo = qs.GetInfo();
- auto imuInfo = imuCont.GetInfo();
- auto lastFr = imu.GetFrame();
+class AcknowledgeHandler {
+private:
+	struct Version {
+		uint8_t Major;
+		uint8_t Minor;
 
- Responce responce;
+		void SerializeTo(uint8_t **ptr) {
+			assert(ptr);
+			assert(*ptr);
 
- responce.Error = 0;
- responce.PeripheryID = Periphery::Global;
- responce.MetaInfo = 0;
- responce.Data.resize(
- QueueSender::Info::Size + IMUFrameContainer::Info::Size
- + BHYWrapper::BHYFrame::Size);
+			**ptr = Major;
+			*ptr += sizeof(uint8_t);
 
- uint8_t *ptr = responce.Data.data();
+			**ptr = Minor;
+			*ptr += sizeof(uint8_t);
+		}
+	};
 
- qsInfo.SerializeTo(&ptr);
- imuInfo.SerializeTo(&ptr);
+	Version CurrentVersion;
 
- uint8_t sz;
- lastFr.SerializeTo(ptr, &sz);
+	public:
+		AcknowledgeHandler(uint8_t versionMaj, uint8_t versionMin) {
+			CurrentVersion.Major = versionMaj;
+			CurrentVersion.Minor = versionMin;
+		}
 
- return responce;
- }
- };
- */
+		Responce Handle(const Request &request) {
+			assert(request.PeripheryID == Periphery::Ack);
+
+			Responce responce;
+			responce.PeripheryID = Periphery::Ack;
+			responce.MetaInfo = 0;
+			responce.Error = 0;
+			responce.Data.resize(2);
+
+			uint8_t* ptr = responce.Data.data();
+			CurrentVersion.SerializeTo(&ptr);
+
+			return responce;
+		}
+	};
+
+	/*
+	 class SystemStateFactory {
+	 public:
+	 Responce GetSystemState(const QueueSender &qs,
+	 const IMUFrameContainer &imuCont, const BHYWrapper &imu) {
+	 auto qsInfo = qs.GetInfo();
+	 auto imuInfo = imuCont.GetInfo();
+	 auto lastFr = imu.GetFrame();
+
+	 Responce responce;
+
+	 responce.Error = 0;
+	 responce.PeripheryID = Periphery::Global;
+	 responce.MetaInfo = 0;
+	 responce.Data.resize(
+	 QueueSender::Info::Size + IMUFrameContainer::Info::Size
+	 + BHYWrapper::BHYFrame::Size);
+
+	 uint8_t *ptr = responce.Data.data();
+
+	 qsInfo.SerializeTo(&ptr);
+	 imuInfo.SerializeTo(&ptr);
+
+	 uint8_t sz;
+	 lastFr.SerializeTo(ptr, &sz);
+
+	 return responce;
+	 }
+	 };
+	 */

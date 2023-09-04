@@ -71,6 +71,9 @@ default.size.stdout \
 OBJDUMP_LIST += \
 roki-mb-firmware.list \
 
+OBJCOPY_BIN += \
+roki-mb-firmware.bin \
+
 
 # All Target
 all: main-build
@@ -94,12 +97,17 @@ roki-mb-firmware.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS
 	@echo 'Finished building: $@'
 	@echo ' '
 
+roki-mb-firmware.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "roki-mb-firmware.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) default.size.stdout roki-mb-firmware.elf roki-mb-firmware.list roki-mb-firmware.map
+	-$(RM) default.size.stdout roki-mb-firmware.bin roki-mb-firmware.elf roki-mb-firmware.list roki-mb-firmware.map
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'
