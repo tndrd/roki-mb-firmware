@@ -75,7 +75,8 @@ private:
 		using Type = uint8_t;
 		static constexpr Type Success = 0;
 		static constexpr Type Timeout = 1;
-		static constexpr Type Unknown = 2;
+		static constexpr Type NACK = 2;
+		static constexpr Type Unknown = 3;
 
 		static uint8_t Serialize(Type error) {
 			return error;
@@ -88,6 +89,10 @@ private:
 	UART_HandleTypeDef *UartHandle;
 
 	size_t TimeoutS;
+
+	bool TransmitComplete = true;
+	bool TimerReady = false;
+
 public:
 	struct Info {
 		uint16_t NumRequests;
@@ -124,10 +129,6 @@ public:
 			if (!HasPriorityRequest) {
 				PriorityRequest = std::move(request);
 				HasPriorityRequest = true;
-
-				if (Requests.empty()) {
-					ProcessPriorityRequest();
-				}
 			}
 			break;
 
@@ -141,6 +142,10 @@ public:
 		return !Responces.empty();
 	}
 
+	void TickTimer() {
+		TimerReady = true;
+	}
+
 	Responce GetResponce() {
 		assert(HasResponce());
 		auto responce = std::move(Responces.front());
@@ -150,7 +155,7 @@ public:
 
 	void ProcessPriorityRequest() {
 		__disable_irq();
-		if (HasPriorityRequest && !WaitResponce) {
+		if (HasPriorityRequest && !WaitResponce && TransmitComplete) {
 			HasPriorityRequest = false;
 			WaitResponce = true;
 			__enable_irq();
@@ -161,22 +166,27 @@ public:
 			assert(
 					MessageMode::Deserialize(request.MetaInfo)
 							== MessageMode::Sync);
+			__disable_irq();
+			TransmitComplete = false;
+			__enable_irq();
+			assert(
+					HAL_UART_Transmit_IT(UartHandle, data.data(), data.size())
+							== HAL_OK);
 
-			CurrentResponceBuffer.resize(request.ResponceSize);
-			HAL_UART_Transmit(UartHandle, data.data(), data.size(), TimeoutS);
 
-			HAL_StatusTypeDef ret = HAL_UART_Receive(UartHandle,
-					CurrentResponceBuffer.data(), CurrentResponceBuffer.size(),
-					TimeoutS);
+			while (!TransmitComplete)
+				;
 
-			ErrorCode::Type error;
+			ErrorCode::Type error = Receive(request.ResponceSize);
 
-			if (ret == HAL_OK)
-				error = ErrorCode::Success;
-			else if (ret == HAL_TIMEOUT)
-				error = ErrorCode::Timeout;
-			else
-				error = ErrorCode::Unknown;
+			if (error == ErrorCode::NACK) {
+				uint32_t delayMS = 5;
+				HAL_Delay(delayMS);
+
+				uint8_t dummy;
+				while (HAL_UART_Receive(UartHandle, &dummy, 1, 0) == HAL_OK)
+					;
+			}
 
 			Responces.emplace(
 					CreateResponce(CurrentResponceBuffer, MessageMode::Sync,
@@ -190,7 +200,7 @@ public:
 
 	void ProcessRequests() {
 		__disable_irq();
-		if (!Requests.empty() && !WaitResponce) {
+		if (TimerReady && !Requests.empty() && !WaitResponce && TransmitComplete) {
 			WaitResponce = true;
 			__enable_irq();
 
@@ -201,16 +211,80 @@ public:
 					MessageMode::Deserialize(request.MetaInfo)
 							== MessageMode::Async);
 
-			CurrentResponceBuffer.resize(request.ResponceSize);
+			const size_t nAttempts = 5;
+			const uint32_t delayMS = 5;
+			size_t i = 0;
 
-			HAL_UART_Receive_IT(UartHandle, CurrentResponceBuffer.data(),
-					CurrentResponceBuffer.size());
-			HAL_UART_Transmit(UartHandle, data.data(), data.size(), TimeoutS);
+			while (i++ < nAttempts) {
+
+				TransmitComplete = false;
+
+				assert(
+						HAL_UART_Transmit_IT(UartHandle, data.data(),
+								data.size()) == HAL_OK);
+
+				while (!TransmitComplete)
+					;
+
+				ErrorCode::Type error = Receive(request.ResponceSize);
+				if (error == ErrorCode::Success)
+					break;
+				HAL_Delay(delayMS);
+				if (error == ErrorCode::NACK) {
+					uint8_t dummy;
+					while (HAL_UART_Receive(UartHandle, &dummy, 1, 0) == HAL_OK)
+									;
+				}
+			}
 
 			Requests.pop_front();
+			WaitResponce = false;
+			TimerReady = false;
 		} else {
 			__enable_irq();
 		}
+	}
+
+	ErrorCode::Type Receive(uint8_t size) {
+		assert(size >= 4);
+		CurrentResponceBuffer.resize(size);
+
+		auto ret = HAL_UART_Receive(UartHandle, CurrentResponceBuffer.data(), 4,
+				TimeoutS);
+
+		if (ret == HAL_TIMEOUT)
+			return ErrorCode::Timeout;
+
+		if (IsNack(CurrentResponceBuffer.data()))
+			return ErrorCode::NACK;
+
+		if (ret != HAL_OK)
+			return ErrorCode::Unknown;
+
+		if (size == 4)
+			return ErrorCode::Success;
+
+		ret = HAL_UART_Receive(UartHandle, CurrentResponceBuffer.data() + 4,
+				size - 4, TimeoutS);
+
+		if (ret == HAL_TIMEOUT)
+			return ErrorCode::Timeout;
+
+		if (ret != HAL_OK)
+			return ErrorCode::Unknown;
+
+		return ErrorCode::Success;
+	}
+
+	bool IsNack(const uint8_t *data) {
+		assert(data);
+		uint8_t kondoNACK[4] = { 0x4, 0xFE, 0x15, 0x17 };
+
+		for (int i = 0; i < 4; ++i)
+			if (data[i] != kondoNACK[i])
+				return false;
+
+		return true;
 	}
 
 	Responce CreateResponce(const std::vector<uint8_t> &data,
@@ -234,7 +308,11 @@ public:
 	}
 
 	void ProcessResponces() {
-		WaitResponce = false;
+		//WaitResponce = false;
+	}
+
+	void FinishTransmit() {
+		TransmitComplete = true;
 	}
 
 	Info GetInfo() const {
@@ -276,7 +354,7 @@ struct HeadInterface {
 
 	void ResetReadState() {
 		CurrentState = ReadState::SOM1;
-		HAL_UART_Receive_IT(UartHandle, &CurrentValue, 1);
+		assert(HAL_UART_Receive_IT(UartHandle, &CurrentValue, 1) == HAL_OK);
 	}
 
 	bool HasRequest() const {
@@ -314,10 +392,9 @@ struct HeadInterface {
 		uint8_t testBuf[64];
 		memcpy(testBuf, CurrentResponceBuffer.data(), sz);
 
-		auto ret = HAL_UART_Transmit(UartHandle, CurrentResponceBuffer.data(),
-				sz, TimeoutS);
-		TransmitComplete = true;
-		auto t = ret;
+		assert(
+				HAL_UART_Transmit_IT(UartHandle, CurrentResponceBuffer.data(),
+						sz) == HAL_OK);
 	}
 
 	Request GetRequest() {
@@ -382,7 +459,7 @@ struct HeadInterface {
 		}
 		case ReadState::SOM3: {
 			if (CurrentValue == SOM3Val) {
-				Requests.push(std::move(CurrentRequest));
+				Requests.emplace(std::move(CurrentRequest));
 				CurrentRequest = { };
 			}
 			ResetReadState();
@@ -632,55 +709,55 @@ private:
 
 	Version CurrentVersion;
 
-	public:
-		AcknowledgeHandler(uint8_t versionMaj, uint8_t versionMin) {
-			CurrentVersion.Major = versionMaj;
-			CurrentVersion.Minor = versionMin;
-		}
+public:
+	AcknowledgeHandler(uint8_t versionMaj, uint8_t versionMin) {
+		CurrentVersion.Major = versionMaj;
+		CurrentVersion.Minor = versionMin;
+	}
 
-		Responce Handle(const Request &request) {
-			assert(request.PeripheryID == Periphery::Ack);
+	Responce Handle(const Request &request) {
+		assert(request.PeripheryID == Periphery::Ack);
 
-			Responce responce;
-			responce.PeripheryID = Periphery::Ack;
-			responce.MetaInfo = 0;
-			responce.Error = 0;
-			responce.Data.resize(2);
+		Responce responce;
+		responce.PeripheryID = Periphery::Ack;
+		responce.MetaInfo = 0;
+		responce.Error = 0;
+		responce.Data.resize(2);
 
-			uint8_t* ptr = responce.Data.data();
-			CurrentVersion.SerializeTo(&ptr);
+		uint8_t *ptr = responce.Data.data();
+		CurrentVersion.SerializeTo(&ptr);
 
-			return responce;
-		}
-	};
+		return responce;
+	}
+};
 
-	/*
-	 class SystemStateFactory {
-	 public:
-	 Responce GetSystemState(const QueueSender &qs,
-	 const IMUFrameContainer &imuCont, const BHYWrapper &imu) {
-	 auto qsInfo = qs.GetInfo();
-	 auto imuInfo = imuCont.GetInfo();
-	 auto lastFr = imu.GetFrame();
+/*
+ class SystemStateFactory {
+ public:
+ Responce GetSystemState(const QueueSender &qs,
+ const IMUFrameContainer &imuCont, const BHYWrapper &imu) {
+ auto qsInfo = qs.GetInfo();
+ auto imuInfo = imuCont.GetInfo();
+ auto lastFr = imu.GetFrame();
 
-	 Responce responce;
+ Responce responce;
 
-	 responce.Error = 0;
-	 responce.PeripheryID = Periphery::Global;
-	 responce.MetaInfo = 0;
-	 responce.Data.resize(
-	 QueueSender::Info::Size + IMUFrameContainer::Info::Size
-	 + BHYWrapper::BHYFrame::Size);
+ responce.Error = 0;
+ responce.PeripheryID = Periphery::Global;
+ responce.MetaInfo = 0;
+ responce.Data.resize(
+ QueueSender::Info::Size + IMUFrameContainer::Info::Size
+ + BHYWrapper::BHYFrame::Size);
 
-	 uint8_t *ptr = responce.Data.data();
+ uint8_t *ptr = responce.Data.data();
 
-	 qsInfo.SerializeTo(&ptr);
-	 imuInfo.SerializeTo(&ptr);
+ qsInfo.SerializeTo(&ptr);
+ imuInfo.SerializeTo(&ptr);
 
-	 uint8_t sz;
-	 lastFr.SerializeTo(ptr, &sz);
+ uint8_t sz;
+ lastFr.SerializeTo(ptr, &sz);
 
-	 return responce;
-	 }
-	 };
-	 */
+ return responce;
+ }
+ };
+ */

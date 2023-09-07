@@ -69,6 +69,9 @@ int MotherboardTick() {
 		mbctx.HeadService.Send(mbctx.Body.GetResponce());
 	}
 
+	mbctx.Body.ProcessPriorityRequest();
+	mbctx.Body.ProcessRequests();
+
 	return 0;
 }
 
@@ -96,9 +99,11 @@ void MotherboardOnHeadStreamTransmitComplete() {
 	mbctx.HeadStream.FinishTransmit();
 }
 
+void MotherboardOnBodyTransmitComplete() {
+	mbctx.Body.FinishTransmit();
+}
 void MotherboardOnBodyTimerTick() {
-	mbctx.Body.ProcessPriorityRequest();
-	mbctx.Body.ProcessRequests();
+	mbctx.Body.TickTimer();
 }
 
 void MotherboardOnImuTimerTick() {

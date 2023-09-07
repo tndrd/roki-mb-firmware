@@ -239,6 +239,9 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
 	if (huart->Instance == UART4) {
 		MotherboardOnHeadStreamTransmitComplete();
 	}
+	if (huart->Instance == UART8) {
+		MotherboardOnBodyTransmitComplete();
+	}
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {

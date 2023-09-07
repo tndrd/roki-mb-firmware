@@ -26,6 +26,7 @@ int MotherboardInit(struct MotherboardConfig conf);
 int MotherboardTick();
 void MotherboardOnStrobe();
 void MotherboardOnBodyRecieveComplete();
+void MotherboardOnBodyTransmitComplete();
 void MotherboardOnHeadServiceRecieveComplete();
 void MotherboardOnHeadStreamRecieveComplete();
 void MotherboardOnHeadServiceTransmitComplete();
