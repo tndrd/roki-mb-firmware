@@ -45,7 +45,7 @@ void MX_COMP2_Init(void)
   hcomp2.Init.BlankingSrce = COMP_BLANKINGSRC_NONE;
   hcomp2.Init.Mode = COMP_POWERMODE_HIGHSPEED;
   hcomp2.Init.WindowMode = COMP_WINDOWMODE_DISABLE;
-  hcomp2.Init.TriggerMode = COMP_TRIGGERMODE_IT_RISING;
+  hcomp2.Init.TriggerMode = COMP_TRIGGERMODE_IT_RISING_FALLING;
   if (HAL_COMP_Init(&hcomp2) != HAL_OK)
   {
     Error_Handler();
@@ -78,7 +78,7 @@ void HAL_COMP_MspInit(COMP_HandleTypeDef* compHandle)
     HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
     /* COMP2 interrupt Init */
-    HAL_NVIC_SetPriority(COMP_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(COMP_IRQn, 4, 0);
     HAL_NVIC_EnableIRQ(COMP_IRQn);
   /* USER CODE BEGIN COMP2_MspInit 1 */
 

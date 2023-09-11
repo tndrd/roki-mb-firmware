@@ -55,6 +55,7 @@ public:
 	int Init(float sampleRate, uint32_t reportLatency);
 	bool Poll();
 	BHYFrame GetFrame() const;
+	size_t GetSeq() const;
 
 private:
 	bhy2_dev bhy2;
@@ -69,4 +70,6 @@ private:
 
 	static void ParseFrame(const bhy2_fifo_parse_data_info *cbInfo,
 			void *cbRef);
+
+	size_t frameSeq = 0;
 };

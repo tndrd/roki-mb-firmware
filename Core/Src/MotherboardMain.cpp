@@ -12,12 +12,16 @@ struct MotherboardContext {
 	HeadInterface HeadService;
 	HeadInterface HeadStream;
 
-	AcknowledgeHandler AckHandler {0, 0};
+	AcknowledgeHandler AckHandler { 0, 0 };
 
 	QueueSender Body;
 	IMUFrameContainer FrameContainer;
+	IMUFrameMemo FrameMemo;
 	BHYWrapper IMU;
 	IMURequestHandler IMUHandler;
+
+	StrobeDurationFilter StrobeFilter;
+	size_t StrobeOffset;
 
 	bool UpdateIMU = false;
 
@@ -26,7 +30,8 @@ struct MotherboardContext {
 					conf.HeadStreamUart, conf.HeadTimeout }, Body {
 					conf.BodyUart, conf.BodyTimeout }, FrameContainer { }, IMU {
 					conf.IMUSpi }, IMUHandler { }, AckHandler {
-					conf.VersionMajor, conf.VersionMinor } {
+					conf.VersionMajor, conf.VersionMinor }, StrobeOffset {
+					conf.StrobeOffset } {
 	}
 
 	MotherboardContext() = default;
@@ -43,8 +48,18 @@ int MotherboardInit(MotherboardConfig conf) {
 }
 
 int MotherboardTick() {
-	if (mbctx.UpdateIMU)
-		mbctx.UpdateIMU = !mbctx.IMU.Poll();
+	if (mbctx.StrobeFilter.HasStrobe()) {
+		size_t targetSeq = mbctx.StrobeFilter.GetStrobe() + mbctx.StrobeOffset;
+		if (mbctx.FrameMemo.Has(targetSeq)) {
+			mbctx.FrameContainer.Add(mbctx.FrameMemo.Get(targetSeq));
+			mbctx.StrobeFilter.PopStrobe();
+		}
+	}
+
+	if (mbctx.UpdateIMU && mbctx.IMU.Poll()) {
+		mbctx.FrameMemo.Add(mbctx.IMU.GetFrame(), mbctx.IMU.GetSeq());
+		mbctx.UpdateIMU = false;
+	}
 
 	if (mbctx.HeadService.HasRequest()) {
 		auto request = mbctx.HeadService.GetRequest();
@@ -60,7 +75,7 @@ int MotherboardTick() {
 		case Periphery::Imu:
 			mbctx.HeadService.Send(
 					mbctx.IMUHandler.Handle(request, mbctx.FrameContainer,
-							mbctx.IMU));
+							mbctx.IMU, mbctx.StrobeOffset, mbctx.StrobeFilter));
 			break;
 		}
 	}
@@ -76,7 +91,13 @@ int MotherboardTick() {
 }
 
 void MotherboardOnStrobe() {
-	mbctx.FrameContainer.Add(mbctx.IMU.GetFrame());
+	static bool firstEntry = true;
+	if (firstEntry) {
+		firstEntry = false;
+		return;
+	}
+
+	mbctx.StrobeFilter.ProcessStrobe(mbctx.IMU);
 }
 
 void MotherboardOnBodyRecieveComplete() {

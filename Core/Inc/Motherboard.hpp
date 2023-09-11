@@ -25,6 +25,7 @@
 #include <deque>
 #include <vector>
 #include <BHYWrapper.hpp>
+#include <cmath>
 
 struct Periphery {
 	static const uint8_t Body = 0;
@@ -173,7 +174,6 @@ public:
 					HAL_UART_Transmit_IT(UartHandle, data.data(), data.size())
 							== HAL_OK);
 
-
 			while (!TransmitComplete)
 				;
 
@@ -200,7 +200,8 @@ public:
 
 	void ProcessRequests() {
 		__disable_irq();
-		if (TimerReady && !Requests.empty() && !WaitResponce && TransmitComplete) {
+		if (TimerReady && !Requests.empty() && !WaitResponce
+				&& TransmitComplete) {
 			WaitResponce = true;
 			__enable_irq();
 
@@ -233,7 +234,7 @@ public:
 				if (error == ErrorCode::NACK) {
 					uint8_t dummy;
 					while (HAL_UART_Receive(UartHandle, &dummy, 1, 0) == HAL_OK)
-									;
+						;
 				}
 			}
 
@@ -543,6 +544,83 @@ public:
 	}
 };
 
+class StrobeDurationFilter {
+public:
+	enum class PulseState {
+		Up, Down
+	};
+private:
+	uint32_t FallTime = 0;
+	uint32_t RiseTime = 0;
+	PulseState State = PulseState::Down;
+
+	uint32_t DurationThreshold = 0;
+	uint32_t TargetDuration = 0;
+
+	float StrobeDuration = 1;
+
+	std::queue<size_t> StrobeQueue;
+	size_t CurrentSeq = 0;
+
+public:
+	void ProcessStrobe(const BHYWrapper &IMU) {
+		uint32_t currentTime = HAL_GetTick();
+
+		switch (State) {
+		case PulseState::Down: {
+			State = PulseState::Up;
+
+			uint32_t startTime = RiseTime;
+			RiseTime = currentTime;
+
+			if (!FallTime || !RiseTime)
+				return;
+
+			uint32_t duration = currentTime - startTime;
+
+			StrobeDuration += duration;
+			StrobeDuration /= 2;
+
+			if (std::abs(long(duration - TargetDuration)) < long(DurationThreshold))
+				StrobeQueue.push(CurrentSeq);
+
+			CurrentSeq = IMU.GetSeq();
+			break;
+		}
+		case PulseState::Up:
+			State = PulseState::Down;
+			FallTime = currentTime;
+			break;
+		}
+	}
+
+	void Configure(uint8_t targetDuration, uint8_t durationThreshold) {
+		TargetDuration = targetDuration;
+		DurationThreshold = durationThreshold;
+	}
+
+	float GetStrobeDuration() const {
+		return StrobeDuration;
+	}
+
+	void ResetStrobeDuration() {
+		StrobeDuration = 1;
+	}
+
+	size_t GetStrobe() const {
+		assert(HasStrobe());
+		return StrobeQueue.front();
+	}
+
+	bool HasStrobe() const {
+		return !StrobeQueue.empty();
+	}
+
+	void PopStrobe() {
+		StrobeQueue.pop();
+	}
+};
+
 class IMURequestHandler {
 public:
 	struct RequestMode {
@@ -551,6 +629,9 @@ public:
 		static constexpr Type Info = 1;
 		static constexpr Type LatestFrame = 2;
 		static constexpr Type Reset = 3;
+		static constexpr Type SetOffset = 4;
+		static constexpr Type StrobeWidth = 5;
+		static constexpr Type ConfigureFilter = 6;
 
 		static uint8_t Serialize(Type mode) {
 			return mode;
@@ -566,6 +647,7 @@ public:
 		static constexpr Type FrameUnavailable = 1;
 		static constexpr Type UnknownMode = 2;
 		static constexpr Type BadRequest = 3;
+		static constexpr Type BadOffset = 4;
 	};
 
 private:
@@ -582,6 +664,7 @@ private:
 
 		if (request.Data.size() != 2) {
 			responce.Error = ErrorCodes::BadRequest;
+			return responce;
 		}
 
 		uint16_t frameSeq =
@@ -613,6 +696,7 @@ private:
 
 		if (request.Data.size() != 1) {
 			responce.Error = ErrorCodes::BadRequest;
+			return responce;
 		}
 
 		uint8_t *ptr = responce.Data.data();
@@ -637,6 +721,7 @@ private:
 
 		if (request.Data.size() != 1) {
 			responce.Error = ErrorCodes::BadRequest;
+			return responce;
 		}
 
 		BHYWrapper::BHYFrame imuFrame = IMU.GetFrame();
@@ -649,7 +734,8 @@ private:
 		return responce;
 	}
 
-	Responce DoReset(const Request &request, IMUFrameContainer &container) {
+	Responce DoReset(const Request &request, IMUFrameContainer &container,
+			StrobeDurationFilter &sFilter) {
 		assert(
 				RequestMode::Deserialize(request.MetaInfo)
 						== RequestMode::Reset);
@@ -661,17 +747,109 @@ private:
 
 		if (request.Data.size() != 1) {
 			responce.Error = ErrorCodes::BadRequest;
+			return responce;
 		}
 
 		container.Reset();
+		sFilter.ResetStrobeDuration();
+
 		responce.Error = ErrorCodes::Success;
 
 		return responce;
 	}
 
+	Responce SetOffset(const Request &request, size_t &strobeOffset) {
+		assert(
+				RequestMode::Deserialize(request.MetaInfo)
+						== RequestMode::SetOffset);
+
+		Responce responce;
+		responce.PeripheryID = Periphery::Imu;
+		responce.MetaInfo = RequestMode::Serialize(RequestMode::SetOffset);
+		responce.Data.resize(1);
+
+		if (request.Data.size() != 1) {
+			responce.Error = ErrorCodes::BadRequest;
+			return responce;
+		}
+
+		uint8_t newOffset = request.Data[0];
+
+		strobeOffset = newOffset;
+		responce.Error = ErrorCodes::Success;
+
+		return responce;
+	}
+
+	Responce ConfigureFilter(const Request &request,
+			StrobeDurationFilter &sFilter) {
+		assert(
+				RequestMode::Deserialize(request.MetaInfo)
+						== RequestMode::ConfigureFilter);
+
+		Responce responce;
+		responce.PeripheryID = Periphery::Imu;
+		responce.MetaInfo = RequestMode::Serialize(
+				RequestMode::ConfigureFilter);
+		responce.Data.resize(1);
+
+		if (request.Data.size() != 2) {
+			responce.Error = ErrorCodes::BadRequest;
+			return responce;
+		}
+
+		uint8_t targetDuration = request.Data[0];
+		uint8_t durationThreshold = request.Data[1];
+
+		sFilter.Configure(targetDuration, durationThreshold);
+		responce.Error = ErrorCodes::Success;
+
+		return responce;
+	}
+
+	Responce StrobeWidth(const Request &request,
+			const StrobeDurationFilter &sFilter) {
+		assert(
+				RequestMode::Deserialize(request.MetaInfo)
+						== RequestMode::StrobeWidth);
+
+		Responce responce;
+		responce.PeripheryID = Periphery::Imu;
+		responce.MetaInfo = RequestMode::Serialize(RequestMode::StrobeWidth);
+		responce.Data.resize(1);
+
+		if (request.Data.size() != 1) {
+			responce.Error = ErrorCodes::BadRequest;
+			return responce;
+		}
+
+		float strobeWidth = sFilter.GetStrobeDuration();
+
+		if (strobeWidth < 0)
+			strobeWidth = 0;
+		if (strobeWidth > 255)
+			strobeWidth = 255;
+
+		responce.Data[0] = static_cast<uint8_t>(strobeWidth);
+		responce.Error = ErrorCodes::Success;
+
+		return responce;
+	}
+
+	Responce UnknownModeResponce(const Request &request) {
+		Responce responce;
+		responce.PeripheryID = Periphery::Imu;
+		responce.MetaInfo = RequestMode::Serialize(
+				RequestMode::Deserialize(request.MetaInfo));
+		responce.Data.resize(request.ResponceSize);
+		responce.Error = ErrorCodes::UnknownMode;
+		return responce;
+	}
+
 public:
 	Responce Handle(const Request &request, IMUFrameContainer &container,
-			const BHYWrapper &IMU) {
+			const BHYWrapper &IMU, size_t &strobeOffset,
+			StrobeDurationFilter &sFilter) {
 		assert(request.PeripheryID == Periphery::Imu);
 
 		switch (RequestMode::Deserialize(request.MetaInfo)) {
@@ -682,10 +860,56 @@ public:
 		case RequestMode::LatestFrame:
 			return GetLatestFrame(request, IMU);
 		case RequestMode::Reset:
-			return DoReset(request, container);
+			return DoReset(request, container, sFilter);
+		case RequestMode::SetOffset:
+			return SetOffset(request, strobeOffset);
+		case RequestMode::StrobeWidth:
+			return StrobeWidth(request, sFilter);
+		case RequestMode::ConfigureFilter:
+			return ConfigureFilter(request, sFilter);
 		default:
-			assert(0 && "Unknown Mode");
+			return UnknownModeResponce(request);
 		}
+	}
+};
+
+class IMUFrameMemo {
+	std::deque<BHYWrapper::BHYFrame> Queue;
+	size_t MaxSize = 800 / 5;
+	size_t FirstSeq = 0;
+
+public:
+	void Add(const BHYWrapper::BHYFrame &frame, size_t seq) {
+		if (Queue.empty()) {
+			FirstSeq = seq;
+		}
+
+		Queue.push_front(frame);
+
+		if (Queue.size() > MaxSize) {
+			Queue.pop_back();
+			FirstSeq++;
+		}
+	}
+
+	bool Has(size_t seq) const {
+		if (Queue.empty())
+			return false;
+
+		if (seq < FirstSeq + Queue.size())
+			return true;
+
+		return false;
+	}
+
+	BHYWrapper::BHYFrame Get(size_t seq) const {
+		assert(Has(seq));
+
+		if (seq < FirstSeq) {
+			return Queue.front();
+		}
+
+		return Queue[(Queue.size() - 1) - (seq - FirstSeq)];
 	}
 };
 

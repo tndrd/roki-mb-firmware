@@ -101,6 +101,7 @@ bool BHYWrapper::Poll() {
 	if (interruptStatus) {
 		assert(
 				bhy2_get_and_process_fifo(WorkBuffer.data(), WorkBuffer.size(), &bhy2) == BHY2_OK);
+		frameSeq++;
 		return true;
 	}
 
@@ -158,7 +159,7 @@ void BHYWrapper::BHYFrame::SerializeTo(uint8_t *dest, uint8_t *size) {
 	*reinterpret_cast<int16_t*>(ptr) = Orientation.W;
 	ptr += sizeof(int16_t);
 
-	 /*
+	/*
 	 *reinterpret_cast<float*>(ptr) = Orientation.Accuracy;
 	 ptr += sizeof(float);
 	 */
@@ -173,4 +174,8 @@ void BHYWrapper::BHYFrame::SerializeTo(uint8_t *dest, uint8_t *size) {
 	ptr += sizeof(uint8_t);
 
 	*size = Size;
+}
+
+size_t BHYWrapper::GetSeq() const {
+	return frameSeq;
 }

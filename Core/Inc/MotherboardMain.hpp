@@ -18,6 +18,7 @@ struct MotherboardConfig {
 	size_t BodyTimeout;
 
 	SPI_HandleTypeDef *IMUSpi;
+	size_t StrobeOffset;
 
 	uint8_t VersionMajor;
 	uint8_t VersionMinor;
