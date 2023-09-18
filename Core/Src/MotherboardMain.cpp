@@ -28,7 +28,7 @@ struct MotherboardContext {
 	MotherboardContext(MotherboardConfig conf) :
 			HeadService { conf.HeadServiceUart, conf.HeadTimeout }, HeadStream {
 					conf.HeadStreamUart, conf.HeadTimeout }, Body {
-					conf.BodyUart, conf.BodyTimeout }, FrameContainer { }, IMU {
+					conf.BodyUart, conf.BodyTimeout, conf.BodyPeriod }, FrameContainer { }, IMU {
 					conf.IMUSpi }, IMUHandler { }, AckHandler {
 					conf.VersionMajor, conf.VersionMinor }, StrobeOffset {
 					conf.StrobeOffset } {
@@ -62,7 +62,7 @@ int MotherboardTick() {
 	}
 
 	if (mbctx.HeadService.HasRequest()) {
-		auto request = mbctx.HeadService.GetRequest();
+		Request request = mbctx.HeadService.GetRequest();
 
 		switch (request.PeripheryID) {
 		case Periphery::Ack:

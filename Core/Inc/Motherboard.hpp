@@ -49,20 +49,12 @@ struct Responce {
 
 struct QueueSender {
 private:
-	std::deque<Request> Requests;
-	std::queue<Responce> Responces;
-
-	Request PriorityRequest;
-	bool HasPriorityRequest = false;
-
-	bool WaitResponce = false;
-	std::vector<uint8_t> CurrentResponceBuffer;
-
 	struct MessageMode final {
 		using Type = uint8_t;
 		static constexpr Type Sync = 0;
 		static constexpr Type Async = 1;
 		static constexpr Type Info = 2;
+		static constexpr Type SetPeriod = 3;
 
 		static uint8_t Serialize(Type mode) {
 			return mode;
@@ -78,6 +70,7 @@ private:
 		static constexpr Type Timeout = 1;
 		static constexpr Type NACK = 2;
 		static constexpr Type Unknown = 3;
+		static constexpr Type BadPeriod = 4;
 
 		static uint8_t Serialize(Type error) {
 			return error;
@@ -87,9 +80,22 @@ private:
 		}
 	};
 
+private:
+	std::deque<Request> Requests;
+	std::queue<Responce> Responces;
+
+	Request PriorityRequest;
+	bool HasPriorityRequest = false;
+
+	bool WaitResponce = false;
+	std::vector<uint8_t> CurrentResponceBuffer;
+
 	UART_HandleTypeDef *UartHandle;
 
 	size_t TimeoutS;
+	uint8_t SendPeriod = 1;
+
+	uint8_t SendTick = 0;
 
 	bool TransmitComplete = true;
 	bool TimerReady = false;
@@ -116,8 +122,8 @@ public:
 public:
 	QueueSender() = default;
 
-	QueueSender(UART_HandleTypeDef *uart, size_t timeoutS) :
-			UartHandle { uart }, TimeoutS { timeoutS } {
+	QueueSender(UART_HandleTypeDef *uart, size_t timeoutS, uint8_t sendPeriod) :
+			UartHandle { uart }, TimeoutS { timeoutS }, SendPeriod { sendPeriod } {
 		assert(uart != NULL);
 	}
 
@@ -136,6 +142,9 @@ public:
 		case MessageMode::Info:
 			Responces.emplace(CreateInfoResponce());
 			break;
+		case MessageMode::SetPeriod:
+			Responces.emplace(ProcessSetPeriodRequest(request));
+			break;
 		}
 	}
 
@@ -144,12 +153,20 @@ public:
 	}
 
 	void TickTimer() {
+		SendTick = (SendTick + 1) % SendPeriod;
+		if (SendTick != 0) return;
+
 		TimerReady = true;
+	}
+
+	void SetSendPeriod(uint8_t periodMs) {
+		assert(periodMs);
+		SendPeriod = periodMs;
 	}
 
 	Responce GetResponce() {
 		assert(HasResponce());
-		auto responce = std::move(Responces.front());
+		Responce responce = std::move(Responces.front());
 		Responces.pop();
 		return responce;
 	}
@@ -202,6 +219,7 @@ public:
 		__disable_irq();
 		if (TimerReady && !Requests.empty() && !WaitResponce
 				&& TransmitComplete) {
+
 			WaitResponce = true;
 			__enable_irq();
 
@@ -237,6 +255,9 @@ public:
 						;
 				}
 			}
+
+			auto cap = Requests.max_size();
+			auto sz = Requests.size();
 
 			Requests.pop_front();
 			WaitResponce = false;
@@ -306,6 +327,22 @@ public:
 		GetInfo().SerializeTo(&ptr);
 
 		return CreateResponce(data, MessageMode::Info, ErrorCode::Success);
+	}
+
+	Responce ProcessSetPeriodRequest(const Request &request) {
+		assert(MessageMode::Deserialize(request.MetaInfo) == MessageMode::SetPeriod);
+		std::vector<uint8_t> data = {0};
+
+		uint8_t newPeriod = request.Data[0];
+
+		ErrorCode::Type error = ErrorCode::Success;
+
+		if (newPeriod == 0)
+			error = ErrorCode::BadPeriod;
+		else
+			SetSendPeriod(newPeriod);
+
+		return CreateResponce(data, MessageMode::SetPeriod, error);
 	}
 
 	void ProcessResponces() {
@@ -400,7 +437,10 @@ struct HeadInterface {
 
 	Request GetRequest() {
 		assert(HasRequest());
-		auto request = std::move(Requests.front());
+		Request request = std::move(Requests.front());
+		//auto cap = Requests.max_size();
+		auto sz = Requests.size();
+
 		Requests.pop();
 		return request;
 	}
@@ -581,7 +621,8 @@ public:
 			StrobeDuration += duration;
 			StrobeDuration /= 2;
 
-			if (std::abs(long(duration - TargetDuration)) < long(DurationThreshold))
+			if (std::abs(long(duration - TargetDuration))
+					< long(DurationThreshold))
 				StrobeQueue.push(CurrentSeq);
 
 			CurrentSeq = IMU.GetSeq();

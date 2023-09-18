@@ -15,6 +15,7 @@ struct MotherboardConfig {
 
 	UART_HandleTypeDef *BodyUart;
 	size_t BodyTimeout;
+	uint8_t BodyPeriod;
 
 	SPI_HandleTypeDef *IMUSpi;
 	size_t StrobeOffset;
