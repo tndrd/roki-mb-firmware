@@ -70,7 +70,7 @@ int MotherboardTick() {
 			break;
 
 		case Periphery::Body:
-			mbctx.Body.AddRequest(std::move(request));
+			mbctx.Body.AddRequest(request);
 			break;
 		case Periphery::Imu:
 			mbctx.HeadService.Send(

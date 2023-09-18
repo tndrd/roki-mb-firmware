@@ -34,17 +34,67 @@ struct Periphery {
 };
 
 struct Request {
-	std::vector<uint8_t> Data;
+	using BufferT = std::array<uint8_t, 256>;
+
+	BufferT Data;
+	size_t RequestSize;
 	size_t ResponceSize;
 	uint8_t MetaInfo;
 	uint8_t PeripheryID;
 };
 
 struct Responce {
-	std::vector<uint8_t> Data;
+	using BufferT = std::array<uint8_t, 256>;
+
+	BufferT Data;
+	size_t ResponceSize;
 	uint8_t PeripheryID;
 	uint8_t MetaInfo;
 	uint8_t Error;
+};
+
+
+template<typename T, size_t Capacity>
+class FixedQueue {
+private:
+	size_t Size = 0;
+	size_t Head = 0;
+	size_t Tail = 0;
+
+	std::array<T, Capacity> Buffer;
+public:
+	bool Push(const T& rhs) {
+		assert(Size != Capacity);
+
+		Buffer[Head] = rhs;
+		Head = (Head + 1) % Capacity;
+		Size++;
+
+		return true;
+	}
+
+	bool Pop() {
+		assert(Size != 0);
+		Tail = (Tail + 1) % Capacity;
+		Size--;
+	}
+
+	const T& Front() const {
+		assert(Size);
+		return Buffer[Tail];
+	}
+
+	bool Empty() const {
+		return Size == 0;
+	}
+
+	bool Full() const {
+		return Size == Capacity;
+	}
+
+	size_t GetSize() const {
+		return Size;
+	}
 };
 
 struct QueueSender {
@@ -81,14 +131,14 @@ private:
 	};
 
 private:
-	std::deque<Request> Requests;
-	std::queue<Responce> Responces;
+	FixedQueue<Request, 500> Requests;
+	FixedQueue<Responce, 10> Responces;
 
 	Request PriorityRequest;
 	bool HasPriorityRequest = false;
 
 	bool WaitResponce = false;
-	std::vector<uint8_t> CurrentResponceBuffer;
+	Responce::BufferT CurrentResponceBuffer;
 
 	UART_HandleTypeDef *UartHandle;
 
@@ -127,34 +177,36 @@ public:
 		assert(uart != NULL);
 	}
 
-	void AddRequest(Request &&request) {
+	void AddRequest(const Request &request) {
 		switch (MessageMode::Deserialize(request.MetaInfo)) {
 		case MessageMode::Async:
-			Requests.emplace_back(std::move(request));
+			Requests.Push(request);
 			break;
 		case MessageMode::Sync:
-			if (!HasPriorityRequest) {
-				PriorityRequest = std::move(request);
-				HasPriorityRequest = true;
-			}
+			if (HasPriorityRequest)
+				break;
+
+			PriorityRequest = request;
+			HasPriorityRequest = true;
 			break;
 
 		case MessageMode::Info:
-			Responces.emplace(CreateInfoResponce());
+			Responces.Push(CreateInfoResponce());
 			break;
 		case MessageMode::SetPeriod:
-			Responces.emplace(ProcessSetPeriodRequest(request));
+			Responces.Push(ProcessSetPeriodRequest(request));
 			break;
 		}
 	}
 
 	bool HasResponce() const {
-		return !Responces.empty();
+		return !Responces.Empty();
 	}
 
 	void TickTimer() {
 		SendTick = (SendTick + 1) % SendPeriod;
-		if (SendTick != 0) return;
+		if (SendTick != 0)
+			return;
 
 		TimerReady = true;
 	}
@@ -166,8 +218,8 @@ public:
 
 	Responce GetResponce() {
 		assert(HasResponce());
-		Responce responce = std::move(Responces.front());
-		Responces.pop();
+		Responce responce = Responces.Front();
+		Responces.Pop();
 		return responce;
 	}
 
@@ -187,9 +239,10 @@ public:
 			__disable_irq();
 			TransmitComplete = false;
 			__enable_irq();
+
 			assert(
-					HAL_UART_Transmit_IT(UartHandle, data.data(), data.size())
-							== HAL_OK);
+					HAL_UART_Transmit_IT(UartHandle, data.data(),
+							request.RequestSize) == HAL_OK);
 
 			while (!TransmitComplete)
 				;
@@ -205,9 +258,9 @@ public:
 					;
 			}
 
-			Responces.emplace(
-					CreateResponce(CurrentResponceBuffer, MessageMode::Sync,
-							error));
+			Responces.Push(
+					CreateResponce(CurrentResponceBuffer, request.ResponceSize,
+							MessageMode::Sync, error));
 
 			WaitResponce = false;
 		} else {
@@ -217,13 +270,13 @@ public:
 
 	void ProcessRequests() {
 		__disable_irq();
-		if (TimerReady && !Requests.empty() && !WaitResponce
+		if (TimerReady && !Requests.Empty() && !WaitResponce
 				&& TransmitComplete) {
 
 			WaitResponce = true;
 			__enable_irq();
 
-			auto &request = Requests.front();
+			auto &request = Requests.Front();
 			auto &data = request.Data;
 
 			assert(
@@ -240,7 +293,7 @@ public:
 
 				assert(
 						HAL_UART_Transmit_IT(UartHandle, data.data(),
-								data.size()) == HAL_OK);
+								request.RequestSize) == HAL_OK);
 
 				while (!TransmitComplete)
 					;
@@ -256,10 +309,7 @@ public:
 				}
 			}
 
-			auto cap = Requests.max_size();
-			auto sz = Requests.size();
-
-			Requests.pop_front();
+			Requests.Pop();
 			WaitResponce = false;
 			TimerReady = false;
 		} else {
@@ -269,7 +319,6 @@ public:
 
 	ErrorCode::Type Receive(uint8_t size) {
 		assert(size >= 4);
-		CurrentResponceBuffer.resize(size);
 
 		auto ret = HAL_UART_Receive(UartHandle, CurrentResponceBuffer.data(), 4,
 				TimeoutS);
@@ -309,10 +358,12 @@ public:
 		return true;
 	}
 
-	Responce CreateResponce(const std::vector<uint8_t> &data,
-			MessageMode::Type messageMode, ErrorCode::Type error) const {
+	Responce CreateResponce(const Responce::BufferT& data,
+			size_t ResponceSize, MessageMode::Type messageMode,
+			ErrorCode::Type error) const {
 		Responce responce;
 		responce.Data = data;
+		responce.ResponceSize = ResponceSize;
 		responce.PeripheryID = Periphery::Body;
 		responce.Error = ErrorCode::Serialize(error);
 		responce.MetaInfo = MessageMode::Serialize(messageMode);
@@ -320,18 +371,18 @@ public:
 	}
 
 	Responce CreateInfoResponce() const {
-		std::vector<uint8_t> data;
-		data.resize(Info::Size);
-
+		Responce::BufferT data;
 		uint8_t *ptr = data.data();
 		GetInfo().SerializeTo(&ptr);
 
-		return CreateResponce(data, MessageMode::Info, ErrorCode::Success);
+		return CreateResponce(data, Info::Size, MessageMode::Info, ErrorCode::Success);
 	}
 
 	Responce ProcessSetPeriodRequest(const Request &request) {
-		assert(MessageMode::Deserialize(request.MetaInfo) == MessageMode::SetPeriod);
-		std::vector<uint8_t> data = {0};
+		assert(
+				MessageMode::Deserialize(request.MetaInfo)
+						== MessageMode::SetPeriod);
+		Responce::BufferT data;
 
 		uint8_t newPeriod = request.Data[0];
 
@@ -342,7 +393,7 @@ public:
 		else
 			SetSendPeriod(newPeriod);
 
-		return CreateResponce(data, MessageMode::SetPeriod, error);
+		return CreateResponce(data, 1, MessageMode::SetPeriod, error);
 	}
 
 	void ProcessResponces() {
@@ -354,35 +405,32 @@ public:
 	}
 
 	Info GetInfo() const {
-		return {Requests.size(), Responces.size()};
+		return {Requests.GetSize(), Responces.GetSize()};
 	}
 };
 
 struct HeadInterface {
+private:
 	static const uint8_t SOM1Val = 0xFF;
 	static const uint8_t SOM2Val = 0xAA;
 	static const uint8_t SOM3Val = 0xAF;
-
-	std::queue<Request> Requests;
-
-	uint8_t CurrentValue;
-	size_t RequestSize;
 
 	enum class ReadState {
 		SOM1, SOM2, PERIPHERY_ID, REQUEST_SIZE, RESPONCE_SIZE, META, DATA, SOM3
 	};
 
-	ReadState CurrentState;
-
-	Request CurrentRequest;
-
-	std::vector<uint8_t> CurrentResponceBuffer;
-
+private:
+	FixedQueue<Request, 10> Requests;
 	UART_HandleTypeDef *UartHandle;
 	size_t TimeoutS;
 
-	bool TransmitComplete = true;
+	uint8_t CurrentValue;
+	ReadState CurrentState;
+	Request CurrentRequest;
+	Responce::BufferT CurrentResponceBuffer;
 
+	bool TransmitComplete = true;
+public:
 	HeadInterface() = default;
 
 	HeadInterface(UART_HandleTypeDef *uart, size_t timeoutS) :
@@ -396,16 +444,13 @@ struct HeadInterface {
 	}
 
 	bool HasRequest() const {
-		return !Requests.empty();
+		return !Requests.Empty();
 	}
 
 	void Send(const Responce &responce) {
 
 		while (!TransmitComplete) {
 		}
-
-		size_t size = responce.Data.size() + 3 + 3;
-		CurrentResponceBuffer.resize(size);
 
 		uint8_t *ptr = CurrentResponceBuffer.data();
 
@@ -415,18 +460,16 @@ struct HeadInterface {
 		*(ptr++) = responce.MetaInfo;
 		*(ptr++) = responce.Error;
 
-		memcpy(ptr, responce.Data.data(), responce.Data.size());
+		memcpy(ptr, responce.Data.data(), responce.ResponceSize);
 
-		ptr += responce.Data.size();
-
+		ptr += responce.ResponceSize;
 		*ptr = SOM3Val;
 
 		//ResetReadState();
 
 		TransmitComplete = false;
 
-		size_t sz = CurrentResponceBuffer.size();
-
+		size_t sz = responce.ResponceSize + 3 + 3;
 		uint8_t testBuf[64];
 		memcpy(testBuf, CurrentResponceBuffer.data(), sz);
 
@@ -437,11 +480,8 @@ struct HeadInterface {
 
 	Request GetRequest() {
 		assert(HasRequest());
-		Request request = std::move(Requests.front());
-		//auto cap = Requests.max_size();
-		auto sz = Requests.size();
-
-		Requests.pop();
+		Request request = Requests.Front();
+		Requests.Pop();
 		return request;
 	}
 
@@ -450,6 +490,8 @@ struct HeadInterface {
 	}
 
 	void ProcessRecievedData() {
+		static size_t nRequests = 0;
+
 		switch (CurrentState) {
 		case ReadState::SOM1: {
 			if (CurrentValue == SOM1Val) {
@@ -474,8 +516,7 @@ struct HeadInterface {
 			break;
 		}
 		case ReadState::REQUEST_SIZE: {
-			RequestSize = CurrentValue;
-			CurrentRequest.Data.resize(RequestSize);
+			CurrentRequest.RequestSize = CurrentValue;
 			CurrentState = ReadState::RESPONCE_SIZE;
 			HAL_UART_Receive_IT(UartHandle, &CurrentValue, 1);
 			break;
@@ -490,7 +531,7 @@ struct HeadInterface {
 			CurrentRequest.MetaInfo = CurrentValue;
 			CurrentState = ReadState::DATA;
 			HAL_UART_Receive_IT(UartHandle, CurrentRequest.Data.data(),
-					RequestSize);
+					CurrentRequest.RequestSize);
 			break;
 		}
 		case ReadState::DATA: {
@@ -500,8 +541,10 @@ struct HeadInterface {
 		}
 		case ReadState::SOM3: {
 			if (CurrentValue == SOM3Val) {
-				Requests.emplace(std::move(CurrentRequest));
-				CurrentRequest = { };
+				size_t sz = Requests.GetSize();
+				Requests.Push(CurrentRequest);
+				nRequests++;
+				//CurrentRequest = { };
 			}
 			ResetReadState();
 			break;
@@ -701,9 +744,9 @@ private:
 		Responce responce;
 		responce.PeripheryID = Periphery::Imu;
 		responce.MetaInfo = RequestMode::Serialize(RequestMode::FrameBySeq);
-		responce.Data.resize(BHYWrapper::BHYFrame::Size);
+		responce.ResponceSize = BHYWrapper::BHYFrame::Size;
 
-		if (request.Data.size() != 2) {
+		if (request.RequestSize != 2) {
 			responce.Error = ErrorCodes::BadRequest;
 			return responce;
 		}
@@ -733,9 +776,9 @@ private:
 		Responce responce;
 		responce.PeripheryID = Periphery::Imu;
 		responce.MetaInfo = RequestMode::Serialize(RequestMode::Info);
-		responce.Data.resize(IMUFrameContainer::Info::Size);
+		responce.ResponceSize = IMUFrameContainer::Info::Size;
 
-		if (request.Data.size() != 1) {
+		if (request.RequestSize != 1) {
 			responce.Error = ErrorCodes::BadRequest;
 			return responce;
 		}
@@ -758,9 +801,9 @@ private:
 		Responce responce;
 		responce.PeripheryID = Periphery::Imu;
 		responce.MetaInfo = RequestMode::Serialize(RequestMode::LatestFrame);
-		responce.Data.resize(BHYWrapper::BHYFrame::Size);
+		responce.ResponceSize = BHYWrapper::BHYFrame::Size;
 
-		if (request.Data.size() != 1) {
+		if (request.RequestSize != 1) {
 			responce.Error = ErrorCodes::BadRequest;
 			return responce;
 		}
@@ -784,9 +827,9 @@ private:
 		Responce responce;
 		responce.PeripheryID = Periphery::Imu;
 		responce.MetaInfo = RequestMode::Serialize(RequestMode::Reset);
-		responce.Data.resize(1);
+		responce.ResponceSize = 1;
 
-		if (request.Data.size() != 1) {
+		if (request.RequestSize != 1) {
 			responce.Error = ErrorCodes::BadRequest;
 			return responce;
 		}
@@ -807,9 +850,9 @@ private:
 		Responce responce;
 		responce.PeripheryID = Periphery::Imu;
 		responce.MetaInfo = RequestMode::Serialize(RequestMode::SetOffset);
-		responce.Data.resize(1);
+		responce.ResponceSize = 1;
 
-		if (request.Data.size() != 1) {
+		if (request.RequestSize != 1) {
 			responce.Error = ErrorCodes::BadRequest;
 			return responce;
 		}
@@ -832,9 +875,9 @@ private:
 		responce.PeripheryID = Periphery::Imu;
 		responce.MetaInfo = RequestMode::Serialize(
 				RequestMode::ConfigureFilter);
-		responce.Data.resize(1);
+		responce.ResponceSize = 1;
 
-		if (request.Data.size() != 2) {
+		if (request.RequestSize != 2) {
 			responce.Error = ErrorCodes::BadRequest;
 			return responce;
 		}
@@ -857,9 +900,9 @@ private:
 		Responce responce;
 		responce.PeripheryID = Periphery::Imu;
 		responce.MetaInfo = RequestMode::Serialize(RequestMode::StrobeWidth);
-		responce.Data.resize(1);
+		responce.ResponceSize = 1;
 
-		if (request.Data.size() != 1) {
+		if (request.RequestSize != 1) {
 			responce.Error = ErrorCodes::BadRequest;
 			return responce;
 		}
@@ -882,7 +925,7 @@ private:
 		responce.PeripheryID = Periphery::Imu;
 		responce.MetaInfo = RequestMode::Serialize(
 				RequestMode::Deserialize(request.MetaInfo));
-		responce.Data.resize(request.ResponceSize);
+		responce.ResponceSize = request.ResponceSize;
 		responce.Error = ErrorCodes::UnknownMode;
 		return responce;
 	}
@@ -987,7 +1030,7 @@ public:
 		responce.PeripheryID = Periphery::Ack;
 		responce.MetaInfo = 0;
 		responce.Error = 0;
-		responce.Data.resize(2);
+		responce.ResponceSize = 2;
 
 		uint8_t *ptr = responce.Data.data();
 		CurrentVersion.SerializeTo(&ptr);
