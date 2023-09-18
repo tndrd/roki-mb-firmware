@@ -53,7 +53,6 @@ struct Responce {
 	uint8_t Error;
 };
 
-
 template<typename T, size_t Capacity>
 class FixedQueue {
 private:
@@ -63,7 +62,7 @@ private:
 
 	std::array<T, Capacity> Buffer;
 public:
-	bool Push(const T& rhs) {
+	bool Push(const T &rhs) {
 		assert(Size != Capacity);
 
 		Buffer[Head] = rhs;
@@ -121,6 +120,7 @@ private:
 		static constexpr Type NACK = 2;
 		static constexpr Type Unknown = 3;
 		static constexpr Type BadPeriod = 4;
+		static constexpr Type QueueFull = 5;
 
 		static uint8_t Serialize(Type error) {
 			return error;
@@ -180,7 +180,7 @@ public:
 	void AddRequest(const Request &request) {
 		switch (MessageMode::Deserialize(request.MetaInfo)) {
 		case MessageMode::Async:
-			Requests.Push(request);
+			Responces.Push(CreateAsyncResponce(request));
 			break;
 		case MessageMode::Sync:
 			if (HasPriorityRequest)
@@ -358,9 +358,8 @@ public:
 		return true;
 	}
 
-	Responce CreateResponce(const Responce::BufferT& data,
-			size_t ResponceSize, MessageMode::Type messageMode,
-			ErrorCode::Type error) const {
+	Responce CreateResponce(const Responce::BufferT &data, size_t ResponceSize,
+			MessageMode::Type messageMode, ErrorCode::Type error) const {
 		Responce responce;
 		responce.Data = data;
 		responce.ResponceSize = ResponceSize;
@@ -375,7 +374,8 @@ public:
 		uint8_t *ptr = data.data();
 		GetInfo().SerializeTo(&ptr);
 
-		return CreateResponce(data, Info::Size, MessageMode::Info, ErrorCode::Success);
+		return CreateResponce(data, Info::Size, MessageMode::Info,
+				ErrorCode::Success);
 	}
 
 	Responce ProcessSetPeriodRequest(const Request &request) {
@@ -394,6 +394,20 @@ public:
 			SetSendPeriod(newPeriod);
 
 		return CreateResponce(data, 1, MessageMode::SetPeriod, error);
+	}
+
+	Responce CreateAsyncResponce(const Request &request) {
+		assert(
+				MessageMode::Deserialize(request.MetaInfo)
+						== MessageMode::Async);
+		ErrorCode::Type error = ErrorCode::Success;
+
+		if (Requests.Full())
+			error = ErrorCode::QueueFull;
+		else
+			Requests.Push(request);
+
+		return CreateResponce({0}, 1, MessageMode::Async, error);
 	}
 
 	void ProcessResponces() {

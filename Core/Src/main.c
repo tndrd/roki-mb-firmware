@@ -127,7 +127,7 @@ int main(void)
 	config.IMUSpi = &hspi1;
 
 	config.VersionMajor = 0;
-	config.VersionMinor = 1;
+	config.VersionMinor = 2;
 
 	config.StrobeOffset = 0;
 
