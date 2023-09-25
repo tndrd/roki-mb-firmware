@@ -1,5 +1,5 @@
 Core/Src/MotherboardMain.o: ../Core/Src/MotherboardMain.cpp \
- ../Core/Inc/MotherboardMain.hpp ../Core/Inc/usart.h ../Core/Inc/main.h \
+ ../Core/Inc/MotherboardMain.h ../Core/Inc/usart.h ../Core/Inc/main.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h \
  ../Core/Inc/stm32h7xx_hal_conf.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rcc.h \
@@ -43,8 +43,9 @@ Core/Src/MotherboardMain.o: ../Core/Src/MotherboardMain.cpp \
  ../Core/Inc/spi.h ../Core/Inc/Motherboard.hpp ../Core/Inc/BHYWrapper.hpp \
  ../Core/Inc/bhy2.h ../Core/Inc/bhy2_defs.h ../Core/Inc/bhy2_hif.h \
  ../Core/Inc/bhy2_parse.h ../Core/Inc/Bosch_SHUTTLE_BHI260_2.fw.h \
- ../Core/Inc/IMU_funcs.h ../Core/Inc/spi.h ../Core/Inc/i2c.h
-../Core/Inc/MotherboardMain.hpp:
+ ../Core/Inc/IMU_funcs.h ../Core/Inc/spi.h ../Core/Inc/i2c.h \
+ ../Core/Inc/Requests.hpp
+../Core/Inc/MotherboardMain.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
@@ -98,3 +99,4 @@ Core/Src/MotherboardMain.o: ../Core/Src/MotherboardMain.cpp \
 ../Core/Inc/IMU_funcs.h:
 ../Core/Inc/spi.h:
 ../Core/Inc/i2c.h:
+../Core/Inc/Requests.hpp:

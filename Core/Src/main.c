@@ -113,12 +113,12 @@ int main(void)
 	HAL_TIM_Base_Start_IT(&htim2);
 	HAL_COMP_Start(&hcomp2);
 
-	struct MotherboardConfig config;
+	MotherboardConfig config;
 
 	config.HeadServiceUart = &huart3;
 	config.HeadStreamUart = &huart4;
 
-	config.HeadTimeout = 10;
+	config.HeadTimeout = 100;
 
 	config.BodyUart = &huart8;
 	config.BodyTimeout = 10;
@@ -129,7 +129,10 @@ int main(void)
 	config.VersionMajor = 0;
 	config.VersionMinor = 2;
 
-	config.StrobeOffset = 0;
+	config.IMUStrobeOffset = 0;
+	config.BodyStrobeOffset = 0;
+
+	config.FrameContainerCapacity = 300;
 
 	if (MotherboardInit(config))
 		return 1;
@@ -220,33 +223,22 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 void HAL_COMP_TriggerCallback(COMP_HandleTypeDef *hcomp) {
-	if (hcomp->Instance == COMP2) {
+	if (hcomp->Instance == COMP2)
 		MotherboardOnStrobe();
-	}
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	if (huart->Instance == USART3) {
-		MotherboardOnHeadServiceRecieveComplete();
-	}
-	if (huart->Instance == UART4) {
-		MotherboardOnHeadStreamRecieveComplete();
-	}
-	if (huart->Instance == UART8) {
+	if (huart->Instance == USART3)
+		MotherboardOnHeadRecieveComplete();
+	if (huart->Instance == UART8)
 		MotherboardOnBodyRecieveComplete();
-	}
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
-	if (huart->Instance == USART3) {
-		MotherboardOnHeadServiceTransmitComplete();
-	}
-	if (huart->Instance == UART4) {
-		MotherboardOnHeadStreamTransmitComplete();
-	}
-	if (huart->Instance == UART8) {
+	if (huart->Instance == USART3)
+		MotherboardOnHeadTransmitComplete();
+	if (huart->Instance == UART8)
 		MotherboardOnBodyTransmitComplete();
-	}
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {

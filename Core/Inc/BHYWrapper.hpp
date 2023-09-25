@@ -41,12 +41,6 @@ public:
 		BHYTimestamp Timestamp;
 
 		uint8_t SensorId;
-
-
-		static constexpr size_t Size = 4 * sizeof(int16_t) + /* sizeof(float) + */ 2 * sizeof(uint32_t)
-		+ sizeof(uint8_t);
-
-		void SerializeTo(uint8_t* dest, uint8_t* size);
 	};
 
 	BHYWrapper(SPI_HandleTypeDef *spiHandle);

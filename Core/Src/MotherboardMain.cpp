@@ -5,87 +5,66 @@
  *      Author: tndrd
  */
 
-#include "MotherboardMain.hpp"
+#include "MotherboardMain.h"
 #include "Motherboard.hpp"
 
-struct MotherboardContext {
-	HeadInterface HeadService;
-	HeadInterface HeadStream;
-
-	AcknowledgeHandler AckHandler { 0, 0 };
-
-	QueueSender Body;
-	IMUFrameContainer FrameContainer;
-	IMUFrameMemo FrameMemo;
-	BHYWrapper IMU;
-	IMURequestHandler IMUHandler;
-
-	StrobeDurationFilter StrobeFilter;
-	size_t StrobeOffset;
-
-	bool UpdateIMU = false;
-
-	MotherboardContext(MotherboardConfig conf) :
-			HeadService { conf.HeadServiceUart, conf.HeadTimeout }, HeadStream {
-					conf.HeadStreamUart, conf.HeadTimeout }, Body {
-					conf.BodyUart, conf.BodyTimeout, conf.BodyPeriod }, FrameContainer { }, IMU {
-					conf.IMUSpi }, IMUHandler { }, AckHandler {
-					conf.VersionMajor, conf.VersionMinor }, StrobeOffset {
-					conf.StrobeOffset } {
-	}
-
-	MotherboardContext() = default;
-};
-
-static MotherboardContext mbctx;
+static MotherboardContext mbCtx;
+static MotherboardRequestHandler mbHandler;
 
 int MotherboardInit(MotherboardConfig conf) {
-	mbctx = MotherboardContext { conf };
+	mbCtx = MotherboardContext { conf };
 
-	mbctx.HeadService.ResetReadState();
-	mbctx.HeadStream.ResetReadState();
-	return mbctx.IMU.Init(800, 0);
+	mbCtx.Head.ResetReadState();
+	return mbCtx.IMU.Init(800, 0);
 }
 
 int MotherboardTick() {
-	if (mbctx.StrobeFilter.HasStrobe()) {
-		size_t targetSeq = mbctx.StrobeFilter.GetStrobe() + mbctx.StrobeOffset;
-		if (mbctx.FrameMemo.Has(targetSeq)) {
-			mbctx.FrameContainer.Add(mbctx.FrameMemo.Get(targetSeq));
-			mbctx.StrobeFilter.PopStrobe();
+	if (mbCtx.StrobeFilter.HasStrobe()) {
+		mbCtx.IMUStrobes.push(
+				mbCtx.StrobeFilter.GetStrobe() + mbCtx.IMUStrobeOffset);
+		mbCtx.BodyStrobes.push(
+				mbCtx.StrobeFilter.GetStrobe() + mbCtx.BodyStrobeOffset);
+		mbCtx.StrobeFilter.PopStrobe();
+	}
+
+	if (!mbCtx.IMUStrobes.empty()) {
+		size_t seq = mbCtx.IMUStrobes.front();
+		if (mbCtx.FrameMemo.Has(seq)) {
+			mbCtx.IMUFrameContainer.Add(mbCtx.FrameMemo.Get(seq));
 		}
 	}
 
-	if (mbctx.UpdateIMU && mbctx.IMU.Poll()) {
-		mbctx.FrameMemo.Add(mbctx.IMU.GetFrame(), mbctx.IMU.GetSeq());
-		mbctx.UpdateIMU = false;
+	if (!mbCtx.BodyStrobes.empty()) {
+		size_t seq = mbCtx.BodyStrobes.front();
+		if (mbCtx.FrameMemo.Has(seq)) {
+			mbCtx.BodyFrameContainer.Add(mbCtx.Body.GetServoData());
+		}
 	}
 
-	if (mbctx.HeadService.HasRequest()) {
-		Request request = mbctx.HeadService.GetRequest();
+	if (mbCtx.UpdateIMU && mbCtx.IMU.Poll()) {
+		mbCtx.FrameMemo.Add(mbCtx.IMU.GetFrame(), mbCtx.IMU.GetSeq());
+		mbCtx.UpdateIMU = false;
+	}
+
+	if (mbCtx.Head.HasRequest()) {
+		Request request = mbCtx.Head.GetRequest();
 
 		switch (request.PeripheryID) {
-		case Periphery::Ack:
-			mbctx.HeadService.Send(mbctx.AckHandler.Handle(request));
-			break;
-
 		case Periphery::Body:
-			mbctx.Body.AddRequest(request);
+			mbCtx.Body.AddRequest(request);
 			break;
-		case Periphery::Imu:
-			mbctx.HeadService.Send(
-					mbctx.IMUHandler.Handle(request, mbctx.FrameContainer,
-							mbctx.IMU, mbctx.StrobeOffset, mbctx.StrobeFilter));
+		case Periphery::Motherboard:
+			mbCtx.Head.Send(mbHandler.Handle(request, mbCtx));
 			break;
 		}
 	}
 
-	if (mbctx.Body.HasResponce()) {
-		mbctx.HeadService.Send(mbctx.Body.GetResponce());
+	if (mbCtx.Body.HasResponce()) {
+		mbCtx.Head.Send(mbCtx.Body.GetResponce());
 	}
 
-	mbctx.Body.ProcessPriorityRequest();
-	mbctx.Body.ProcessRequests();
+	mbCtx.Body.ProcessPriorityRequest();
+	mbCtx.Body.ProcessRequests();
 
 	return 0;
 }
@@ -97,36 +76,28 @@ void MotherboardOnStrobe() {
 		return;
 	}
 
-	mbctx.StrobeFilter.ProcessStrobe(mbctx.IMU);
+	mbCtx.StrobeFilter.ProcessStrobe(mbCtx.IMU);
 }
 
 void MotherboardOnBodyRecieveComplete() {
-	mbctx.Body.ProcessResponces();
+	mbCtx.Body.ProcessResponces();
 }
 
-void MotherboardOnHeadServiceRecieveComplete() {
-	mbctx.HeadService.ProcessRecievedData();
+void MotherboardOnHeadRecieveComplete() {
+	mbCtx.Head.ProcessRecievedData();
 }
 
-void MotherboardOnHeadStreamRecieveComplete() {
-	mbctx.HeadStream.ProcessRecievedData();
-}
-
-void MotherboardOnHeadServiceTransmitComplete() {
-	mbctx.HeadService.FinishTransmit();
-}
-
-void MotherboardOnHeadStreamTransmitComplete() {
-	mbctx.HeadStream.FinishTransmit();
+void MotherboardOnHeadTransmitComplete() {
+	mbCtx.Head.FinishTransmit();
 }
 
 void MotherboardOnBodyTransmitComplete() {
-	mbctx.Body.FinishTransmit();
+	mbCtx.Body.FinishTransmit();
 }
 void MotherboardOnBodyTimerTick() {
-	mbctx.Body.TickTimer();
+	mbCtx.Body.TickTimer();
 }
 
 void MotherboardOnImuTimerTick() {
-	mbctx.UpdateIMU = true;
+	mbCtx.UpdateIMU = true;
 }
