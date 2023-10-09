@@ -4,86 +4,86 @@
 ../Core/Inc/Motherboard.hpp:121:18:static uint8_t QueueSender::MessageMode::Serialize(QueueSender::MessageMode::Type)	16	static
 ../Core/Inc/Motherboard.hpp:124:15:static QueueSender::MessageMode::Type QueueSender::MessageMode::Deserialize(uint8_t)	16	static
 ../Core/Inc/Motherboard.hpp:138:18:static uint8_t QueueSender::ErrorCode::Serialize(QueueSender::ErrorCode::Type)	16	static
-../Core/Inc/Motherboard.hpp:173:8:void QueueSender::Info::SerializeTo(uint8_t**)	16	static
+../Core/Inc/Motherboard.hpp:175:8:void QueueSender::Info::SerializeTo(uint8_t**)	16	static
 ../Core/Inc/Motherboard.hpp:57:7:FixedQueue<Request, 500>::FixedQueue()	16	static
 ../Core/Inc/Motherboard.hpp:57:7:FixedQueue<Responce, 10>::FixedQueue()	16	static
-../Core/Inc/Motherboard.hpp:188:2:QueueSender::QueueSender(UART_HandleTypeDef*, size_t, uint8_t)	24	static
-../Core/Inc/Motherboard.hpp:193:7:void QueueSender::AddRequest(const Request&)	1080	static
-../Core/Inc/Motherboard.hpp:218:7:bool QueueSender::HasResponce() const	16	static
-../Core/Inc/Motherboard.hpp:222:7:void QueueSender::TickTimer()	16	static
-../Core/Inc/Motherboard.hpp:230:7:void QueueSender::SetSendPeriod(uint8_t)	16	static
-../Core/Inc/Motherboard.hpp:235:11:Responce QueueSender::GetResponce()	16	static
-../Core/Inc/Motherboard.hpp:242:7:void QueueSender::ProcessPriorityRequest()	320	static,ignoring_inline_asm
-../Core/Inc/Motherboard.hpp:287:7:void QueueSender::ProcessRequests()	48	static,ignoring_inline_asm
-../Core/Inc/Motherboard.hpp:344:18:QueueSender::ErrorCode::Type QueueSender::Receive(uint8_t)	32	static
-../Core/Inc/Motherboard.hpp:374:7:bool QueueSender::IsNack(const uint8_t*)	24	static
-../Core/Inc/Motherboard.hpp:385:11:Responce QueueSender::CreateResponce(const BufferT&, size_t, QueueSender::MessageMode::Type, QueueSender::ErrorCode::Type) const	24	static
-../Core/Inc/Motherboard.hpp:396:11:Responce QueueSender::CreateInfoResponce() const	288	static
-../Core/Inc/Motherboard.hpp:405:11:Responce QueueSender::ResetQueue()	280	static
+../Core/Inc/Motherboard.hpp:190:2:QueueSender::QueueSender(UART_HandleTypeDef*, size_t, uint8_t)	24	static
+../Core/Inc/Motherboard.hpp:195:7:void QueueSender::AddRequest(const Request&)	1080	static
+../Core/Inc/Motherboard.hpp:220:7:bool QueueSender::HasResponce() const	16	static
+../Core/Inc/Motherboard.hpp:224:7:void QueueSender::TickTimer()	16	static
+../Core/Inc/Motherboard.hpp:232:7:void QueueSender::SetSendPeriod(uint8_t)	16	static
+../Core/Inc/Motherboard.hpp:237:11:Responce QueueSender::GetResponce()	16	static
+../Core/Inc/Motherboard.hpp:244:7:void QueueSender::ProcessPriorityRequest()	320	static,ignoring_inline_asm
+../Core/Inc/Motherboard.hpp:289:7:void QueueSender::ProcessRequests()	48	static,ignoring_inline_asm
+../Core/Inc/Motherboard.hpp:349:18:QueueSender::ErrorCode::Type QueueSender::Receive(uint8_t)	32	static
+../Core/Inc/Motherboard.hpp:379:7:bool QueueSender::IsNack(const uint8_t*)	24	static
+../Core/Inc/Motherboard.hpp:390:11:Responce QueueSender::CreateResponce(const BufferT&, size_t, QueueSender::MessageMode::Type, QueueSender::ErrorCode::Type) const	24	static
+../Core/Inc/Motherboard.hpp:401:11:Responce QueueSender::CreateInfoResponce() const	288	static
+../Core/Inc/Motherboard.hpp:410:11:Responce QueueSender::ResetQueue()	280	static
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/array:189:7:constexpr const value_type& std::array<_Tp, _Nm>::operator[](std::array<_Tp, _Nm>::size_type) const [with _Tp = unsigned char; unsigned int _Nm = 256]	16	static
-../Core/Inc/Motherboard.hpp:413:11:Responce QueueSender::ProcessSetPeriodRequest(const Request&)	296	static
-../Core/Inc/Motherboard.hpp:431:11:Responce QueueSender::CreateAsyncResponce(const Request&)	296	static
-../Core/Inc/Motherboard.hpp:445:7:void QueueSender::ProcessResponces()	16	static
-../Core/Inc/Motherboard.hpp:449:7:void QueueSender::FinishTransmit()	16	static
-../Core/Inc/Motherboard.hpp:453:7:QueueSender::Info QueueSender::GetInfo() const	24	static
+../Core/Inc/Motherboard.hpp:419:11:Responce QueueSender::ProcessSetPeriodRequest(const Request&)	296	static
+../Core/Inc/Motherboard.hpp:437:11:Responce QueueSender::CreateAsyncResponce(const Request&)	296	static
+../Core/Inc/Motherboard.hpp:451:7:void QueueSender::ProcessResponces()	16	static
+../Core/Inc/Motherboard.hpp:455:7:void QueueSender::FinishTransmit()	16	static
+../Core/Inc/Motherboard.hpp:459:7:QueueSender::Info QueueSender::GetInfo() const	24	static
 ../Core/Inc/Motherboard.hpp:57:7:FixedQueue<Request, 10>::FixedQueue()	16	static
-../Core/Inc/Motherboard.hpp:482:2:HeadInterface::HeadInterface(UART_HandleTypeDef*, size_t)	24	static
-../Core/Inc/Motherboard.hpp:487:7:void HeadInterface::ResetReadState()	16	static
-../Core/Inc/Motherboard.hpp:492:7:bool HeadInterface::HasRequest() const	16	static
-../Core/Inc/Motherboard.hpp:496:7:void HeadInterface::Send(const Responce&)	96	static
-../Core/Inc/Motherboard.hpp:527:10:Request HeadInterface::GetRequest()	16	static
-../Core/Inc/Motherboard.hpp:534:7:void HeadInterface::FinishTransmit()	16	static
-../Core/Inc/Motherboard.hpp:538:7:void HeadInterface::ProcessRecievedData()	32	static
-../Core/Inc/Motherboard.hpp:619:8:void IMUFrameContainer::Info::SerializeTo(uint8_t**)	16	static
-../Core/Inc/Motherboard.hpp:635:7:void IMUFrameContainer::Reset()	24	static
-../Core/Inc/Motherboard.hpp:640:7:void IMUFrameContainer::Add(const BHYWrapper::BHYFrame&)	16	static
-../Core/Inc/Motherboard.hpp:646:7:void IMUFrameContainer::Remove()	16	static
-../Core/Inc/Motherboard.hpp:651:7:bool IMUFrameContainer::Get(size_t, BHYWrapper::BHYFrame&) const	56	static
-../Core/Inc/Motherboard.hpp:671:7:IMUFrameContainer::Info IMUFrameContainer::GetInfo() const	16	static
-../Core/Inc/Motherboard.hpp:695:7:void StrobeDurationFilter::ProcessStrobe(const BHYWrapper&)	32	static
-../Core/Inc/Motherboard.hpp:727:7:void StrobeDurationFilter::Configure(uint8_t, uint8_t)	16	static
-../Core/Inc/Motherboard.hpp:732:8:float StrobeDurationFilter::GetStrobeDuration() const	16	static
-../Core/Inc/Motherboard.hpp:736:7:void StrobeDurationFilter::ResetStrobeDuration()	16	static
-../Core/Inc/Motherboard.hpp:740:9:size_t StrobeDurationFilter::GetStrobe() const	16	static
-../Core/Inc/Motherboard.hpp:745:7:bool StrobeDurationFilter::HasStrobe() const	16	static
-../Core/Inc/Motherboard.hpp:749:7:void StrobeDurationFilter::PopStrobe()	16	static
-../Core/Inc/Motherboard.hpp:766:18:static uint8_t IMURequestHandler::RequestMode::Serialize(IMURequestHandler::RequestMode::Type)	16	static
-../Core/Inc/Motherboard.hpp:769:15:static IMURequestHandler::RequestMode::Type IMURequestHandler::RequestMode::Deserialize(uint8_t)	16	static
-../Core/Inc/Motherboard.hpp:784:11:Responce IMURequestHandler::GetFrameBySeq(const Request&, const IMUFrameContainer&)	56	static
-../Core/Inc/Motherboard.hpp:818:11:Responce IMURequestHandler::GetInfo(const Request&, const IMUFrameContainer&)	40	static
-../Core/Inc/Motherboard.hpp:842:11:Responce IMURequestHandler::GetLatestFrame(const Request&, const BHYWrapper&)	48	static
-../Core/Inc/Motherboard.hpp:867:11:Responce IMURequestHandler::DoReset(const Request&, IMUFrameContainer&, StrobeDurationFilter&)	24	static
-../Core/Inc/Motherboard.hpp:891:11:Responce IMURequestHandler::SetOffset(const Request&, size_t&)	32	static
-../Core/Inc/Motherboard.hpp:914:11:Responce IMURequestHandler::ConfigureFilter(const Request&, StrobeDurationFilter&)	32	static
-../Core/Inc/Motherboard.hpp:940:11:Responce IMURequestHandler::StrobeWidth(const Request&, const StrobeDurationFilter&)	40	static
-../Core/Inc/Motherboard.hpp:969:11:Responce IMURequestHandler::UnknownModeResponce(const Request&)	24	static
-../Core/Inc/Motherboard.hpp:980:11:Responce IMURequestHandler::Handle(const Request&, IMUFrameContainer&, const BHYWrapper&, size_t&, StrobeDurationFilter&)	32	static
-../Core/Inc/Motherboard.hpp:1012:7:void IMUFrameMemo::Add(const BHYWrapper::BHYFrame&, size_t)	24	static
-../Core/Inc/Motherboard.hpp:1025:7:bool IMUFrameMemo::Has(size_t) const	24	static
-../Core/Inc/Motherboard.hpp:1035:23:BHYWrapper::BHYFrame IMUFrameMemo::Get(size_t) const	32	static
-../Core/Inc/Motherboard.hpp:1052:8:void AcknowledgeHandler::Version::SerializeTo(uint8_t**)	16	static
-../Core/Inc/Motherboard.hpp:1067:2:AcknowledgeHandler::AcknowledgeHandler(uint8_t, uint8_t)	16	static
-../Core/Inc/Motherboard.hpp:1072:11:Responce AcknowledgeHandler::Handle(const Request&)	32	static
+../Core/Inc/Motherboard.hpp:488:2:HeadInterface::HeadInterface(UART_HandleTypeDef*, size_t)	24	static
+../Core/Inc/Motherboard.hpp:493:7:void HeadInterface::ResetReadState()	16	static
+../Core/Inc/Motherboard.hpp:498:7:bool HeadInterface::HasRequest() const	16	static
+../Core/Inc/Motherboard.hpp:502:7:void HeadInterface::Send(const Responce&)	96	static
+../Core/Inc/Motherboard.hpp:533:10:Request HeadInterface::GetRequest()	16	static
+../Core/Inc/Motherboard.hpp:540:7:void HeadInterface::FinishTransmit()	16	static
+../Core/Inc/Motherboard.hpp:544:7:void HeadInterface::ProcessRecievedData()	32	static
+../Core/Inc/Motherboard.hpp:625:8:void IMUFrameContainer::Info::SerializeTo(uint8_t**)	16	static
+../Core/Inc/Motherboard.hpp:641:7:void IMUFrameContainer::Reset()	24	static
+../Core/Inc/Motherboard.hpp:646:7:void IMUFrameContainer::Add(const BHYWrapper::BHYFrame&)	16	static
+../Core/Inc/Motherboard.hpp:652:7:void IMUFrameContainer::Remove()	16	static
+../Core/Inc/Motherboard.hpp:657:7:bool IMUFrameContainer::Get(size_t, BHYWrapper::BHYFrame&) const	56	static
+../Core/Inc/Motherboard.hpp:677:7:IMUFrameContainer::Info IMUFrameContainer::GetInfo() const	16	static
+../Core/Inc/Motherboard.hpp:701:7:void StrobeDurationFilter::ProcessStrobe(const BHYWrapper&)	32	static
+../Core/Inc/Motherboard.hpp:733:7:void StrobeDurationFilter::Configure(uint8_t, uint8_t)	16	static
+../Core/Inc/Motherboard.hpp:738:8:float StrobeDurationFilter::GetStrobeDuration() const	16	static
+../Core/Inc/Motherboard.hpp:742:7:void StrobeDurationFilter::ResetStrobeDuration()	16	static
+../Core/Inc/Motherboard.hpp:746:9:size_t StrobeDurationFilter::GetStrobe() const	16	static
+../Core/Inc/Motherboard.hpp:751:7:bool StrobeDurationFilter::HasStrobe() const	16	static
+../Core/Inc/Motherboard.hpp:755:7:void StrobeDurationFilter::PopStrobe()	16	static
+../Core/Inc/Motherboard.hpp:772:18:static uint8_t IMURequestHandler::RequestMode::Serialize(IMURequestHandler::RequestMode::Type)	16	static
+../Core/Inc/Motherboard.hpp:775:15:static IMURequestHandler::RequestMode::Type IMURequestHandler::RequestMode::Deserialize(uint8_t)	16	static
+../Core/Inc/Motherboard.hpp:790:11:Responce IMURequestHandler::GetFrameBySeq(const Request&, const IMUFrameContainer&)	56	static
+../Core/Inc/Motherboard.hpp:824:11:Responce IMURequestHandler::GetInfo(const Request&, const IMUFrameContainer&)	40	static
+../Core/Inc/Motherboard.hpp:848:11:Responce IMURequestHandler::GetLatestFrame(const Request&, const BHYWrapper&)	48	static
+../Core/Inc/Motherboard.hpp:873:11:Responce IMURequestHandler::DoReset(const Request&, IMUFrameContainer&, StrobeDurationFilter&)	24	static
+../Core/Inc/Motherboard.hpp:897:11:Responce IMURequestHandler::SetOffset(const Request&, size_t&)	32	static
+../Core/Inc/Motherboard.hpp:920:11:Responce IMURequestHandler::ConfigureFilter(const Request&, StrobeDurationFilter&)	32	static
+../Core/Inc/Motherboard.hpp:946:11:Responce IMURequestHandler::StrobeWidth(const Request&, const StrobeDurationFilter&)	40	static
+../Core/Inc/Motherboard.hpp:975:11:Responce IMURequestHandler::UnknownModeResponce(const Request&)	24	static
+../Core/Inc/Motherboard.hpp:986:11:Responce IMURequestHandler::Handle(const Request&, IMUFrameContainer&, const BHYWrapper&, size_t&, StrobeDurationFilter&)	32	static
+../Core/Inc/Motherboard.hpp:1018:7:void IMUFrameMemo::Add(const BHYWrapper::BHYFrame&, size_t)	24	static
+../Core/Inc/Motherboard.hpp:1031:7:bool IMUFrameMemo::Has(size_t) const	24	static
+../Core/Inc/Motherboard.hpp:1041:23:BHYWrapper::BHYFrame IMUFrameMemo::Get(size_t) const	32	static
+../Core/Inc/Motherboard.hpp:1058:8:void AcknowledgeHandler::Version::SerializeTo(uint8_t**)	16	static
+../Core/Inc/Motherboard.hpp:1073:2:AcknowledgeHandler::AcknowledgeHandler(uint8_t, uint8_t)	16	static
+../Core/Inc/Motherboard.hpp:1078:11:Responce AcknowledgeHandler::Handle(const Request&)	32	static
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/bits/stl_deque.h:831:7:std::deque<_Tp, _Alloc>::deque() [with _Tp = BHYWrapper::BHYFrame; _Alloc = std::allocator<BHYWrapper::BHYFrame>]	16	static
-../Core/Inc/Motherboard.hpp:606:7:IMUFrameContainer::IMUFrameContainer()	16	static
-../Core/Inc/Motherboard.hpp:606:7:IMUFrameContainer::~IMUFrameContainer()	16	static
-../Core/Inc/Motherboard.hpp:1006:7:IMUFrameMemo::IMUFrameMemo()	16	static
-../Core/Inc/Motherboard.hpp:1006:7:IMUFrameMemo::~IMUFrameMemo()	16	static
+../Core/Inc/Motherboard.hpp:612:7:IMUFrameContainer::IMUFrameContainer()	16	static
+../Core/Inc/Motherboard.hpp:612:7:IMUFrameContainer::~IMUFrameContainer()	16	static
+../Core/Inc/Motherboard.hpp:1012:7:IMUFrameMemo::IMUFrameMemo()	16	static
+../Core/Inc/Motherboard.hpp:1012:7:IMUFrameMemo::~IMUFrameMemo()	16	static
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/bits/stl_queue.h:96:11:std::queue<unsigned int>::~queue()	16	static
-../Core/Inc/Motherboard.hpp:676:7:StrobeDurationFilter::StrobeDurationFilter()	16	static
-../Core/Inc/Motherboard.hpp:676:7:StrobeDurationFilter::~StrobeDurationFilter()	16	static
+../Core/Inc/Motherboard.hpp:682:7:StrobeDurationFilter::StrobeDurationFilter()	16	static
+../Core/Inc/Motherboard.hpp:682:7:StrobeDurationFilter::~StrobeDurationFilter()	16	static
 ../Core/Src/MotherboardMain.cpp:28:2:MotherboardContext::MotherboardContext(MotherboardConfig)	16	static
-../Core/Inc/Motherboard.hpp:480:2:HeadInterface::HeadInterface()	16	static
-../Core/Inc/Motherboard.hpp:186:2:QueueSender::QueueSender()	16	static
+../Core/Inc/Motherboard.hpp:486:2:HeadInterface::HeadInterface()	16	static
+../Core/Inc/Motherboard.hpp:188:2:QueueSender::QueueSender()	16	static
 ../Core/Inc/BHYWrapper.hpp:53:2:BHYWrapper::BHYWrapper()	16	static
 ../Core/Src/MotherboardMain.cpp:37:2:MotherboardContext::MotherboardContext()	16	static
 ../Core/Src/MotherboardMain.cpp:11:8:MotherboardContext::~MotherboardContext()	16	static
-../Core/Inc/Motherboard.hpp:606:7:IMUFrameContainer& IMUFrameContainer::operator=(IMUFrameContainer&&)	16	static
-../Core/Inc/Motherboard.hpp:1006:7:IMUFrameMemo& IMUFrameMemo::operator=(IMUFrameMemo&&)	16	static
+../Core/Inc/Motherboard.hpp:612:7:IMUFrameContainer& IMUFrameContainer::operator=(IMUFrameContainer&&)	16	static
+../Core/Inc/Motherboard.hpp:1012:7:IMUFrameMemo& IMUFrameMemo::operator=(IMUFrameMemo&&)	16	static
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/bits/stl_queue.h:96:11:std::queue<unsigned int>& std::queue<unsigned int>::operator=(std::queue<unsigned int>&&)	16	static
-../Core/Inc/Motherboard.hpp:676:7:StrobeDurationFilter& StrobeDurationFilter::operator=(StrobeDurationFilter&&)	16	static
+../Core/Inc/Motherboard.hpp:682:7:StrobeDurationFilter& StrobeDurationFilter::operator=(StrobeDurationFilter&&)	16	static
 ../Core/Src/MotherboardMain.cpp:11:8:MotherboardContext& MotherboardContext::operator=(MotherboardContext&&)	16	static
-../Core/Src/MotherboardMain.cpp:42:5:int MotherboardInit(MotherboardConfig)	148344	static
+../Core/Src/MotherboardMain.cpp:42:5:int MotherboardInit(MotherboardConfig)	148352	static
 ../Core/Src/MotherboardMain.cpp:50:5:int MotherboardTick()	1128	static
 ../Core/Src/MotherboardMain.cpp:93:6:void MotherboardOnStrobe()	8	static
 ../Core/Src/MotherboardMain.cpp:103:6:void MotherboardOnBodyRecieveComplete()	8	static

@@ -160,6 +160,8 @@ private:
 
 	uint8_t SendTick = 0;
 
+	uint8_t NPause = 0;
+
 	bool TransmitComplete = true;
 	bool TimerReady = false;
 
@@ -294,11 +296,14 @@ public:
 
 			auto &nPause = request.Data[0];
 
-			if (nPause != 0) {
-				nPause--;
+			if (NPause != 0) {
+				NPause--;
+				TimerReady = false;
 				__enable_irq();
 				return;
 			}
+
+			NPause = nPause;
 
 			WaitResponce = true;
 			__enable_irq();
@@ -405,6 +410,7 @@ public:
 	Responce ResetQueue() {
 		Responce::BufferT data;
 		Requests.Clear();
+		NPause = 0;
 
 		return CreateResponce(data, 1, MessageMode::ResetQueue,
 				ErrorCode::Success);
