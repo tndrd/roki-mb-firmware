@@ -83,6 +83,11 @@ public:
 		return Buffer[Tail];
 	}
 
+	T& Front() {
+		assert(Size);
+		return Buffer[Tail];
+	}
+
 	bool Empty() const {
 		return Size == 0;
 	}
@@ -96,7 +101,7 @@ public:
 	}
 
 	void Clear() {
-		Buffer = std::array<T, Capacity>{};
+		Buffer = std::array<T, Capacity> { };
 		Size = 0;
 		Head = 0;
 		Tail = 0;
@@ -284,11 +289,19 @@ public:
 		if (TimerReady && !Requests.Empty() && !WaitResponce
 				&& TransmitComplete) {
 
+			auto &request = Requests.Front();
+			auto data = request.Data.data() + 1;
+
+			auto &nPause = request.Data[0];
+
+			if (nPause != 0) {
+				nPause--;
+				__enable_irq();
+				return;
+			}
+
 			WaitResponce = true;
 			__enable_irq();
-
-			auto &request = Requests.Front();
-			auto &data = request.Data;
 
 			assert(
 					MessageMode::Deserialize(request.MetaInfo)
@@ -303,7 +316,7 @@ public:
 				TransmitComplete = false;
 
 				assert(
-						HAL_UART_Transmit_IT(UartHandle, data.data(),
+						HAL_UART_Transmit_IT(UartHandle, data,
 								request.RequestSize) == HAL_OK);
 
 				while (!TransmitComplete)
@@ -393,7 +406,8 @@ public:
 		Responce::BufferT data;
 		Requests.Clear();
 
-		return CreateResponce(data, 1, MessageMode::ResetQueue, ErrorCode::Success);
+		return CreateResponce(data, 1, MessageMode::ResetQueue,
+				ErrorCode::Success);
 	}
 
 	Responce ProcessSetPeriodRequest(const Request &request) {
@@ -425,7 +439,7 @@ public:
 		else
 			Requests.Push(request);
 
-		return CreateResponce({0}, 1, MessageMode::Async, error);
+		return CreateResponce( { 0 }, 1, MessageMode::Async, error);
 	}
 
 	void ProcessResponces() {
