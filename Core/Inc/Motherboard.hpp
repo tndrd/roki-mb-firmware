@@ -94,6 +94,13 @@ public:
 	size_t GetSize() const {
 		return Size;
 	}
+
+	void Clear() {
+		Buffer = std::array<T, Capacity>{};
+		Size = 0;
+		Head = 0;
+		Tail = 0;
+	}
 };
 
 struct QueueSender {
@@ -104,6 +111,7 @@ private:
 		static constexpr Type Async = 1;
 		static constexpr Type Info = 2;
 		static constexpr Type SetPeriod = 3;
+		static constexpr Type ResetQueue = 4;
 
 		static uint8_t Serialize(Type mode) {
 			return mode;
@@ -195,6 +203,9 @@ public:
 			break;
 		case MessageMode::SetPeriod:
 			Responces.Push(ProcessSetPeriodRequest(request));
+			break;
+		case MessageMode::ResetQueue:
+			Responces.Push(ResetQueue());
 			break;
 		}
 	}
@@ -376,6 +387,13 @@ public:
 
 		return CreateResponce(data, Info::Size, MessageMode::Info,
 				ErrorCode::Success);
+	}
+
+	Responce ResetQueue() {
+		Responce::BufferT data;
+		Requests.Clear();
+
+		return CreateResponce(data, 1, MessageMode::ResetQueue, ErrorCode::Success);
 	}
 
 	Responce ProcessSetPeriodRequest(const Request &request) {
