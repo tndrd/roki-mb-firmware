@@ -7,6 +7,7 @@
 
 #include "MotherboardMain.h"
 #include "Motherboard.hpp"
+#include "NEWMotherboard.hpp"
 
 static MotherboardContext mbCtx;
 static MotherboardRequestHandler mbHandler;

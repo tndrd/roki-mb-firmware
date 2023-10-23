@@ -44,7 +44,9 @@ Core/Src/MotherboardMain.o: ../Core/Src/MotherboardMain.cpp \
  ../Core/Inc/bhy2.h ../Core/Inc/bhy2_defs.h ../Core/Inc/bhy2_hif.h \
  ../Core/Inc/bhy2_parse.h ../Core/Inc/Bosch_SHUTTLE_BHI260_2.fw.h \
  ../Core/Inc/IMU_funcs.h ../Core/Inc/spi.h ../Core/Inc/i2c.h \
- ../Core/Inc/Requests.hpp
+ ../Core/Inc/Requests.hpp ../Core/Inc/NEWMotherboard.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-service/inc/MbService.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-service/inc/MbMessages.hpp
 ../Core/Inc/MotherboardMain.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/main.h:
@@ -100,3 +102,6 @@ Core/Src/MotherboardMain.o: ../Core/Src/MotherboardMain.cpp \
 ../Core/Inc/spi.h:
 ../Core/Inc/i2c.h:
 ../Core/Inc/Requests.hpp:
+../Core/Inc/NEWMotherboard.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-service/inc/MbService.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-service/inc/MbMessages.hpp:

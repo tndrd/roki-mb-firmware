@@ -80,15 +80,15 @@
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/bits/stl_queue.h:96:11:std::queue<unsigned int>& std::queue<unsigned int>::operator=(std::queue<unsigned int>&&)	16	static
 ../Core/Inc/Motherboard.hpp:768:7:StrobeDurationFilter& StrobeDurationFilter::operator=(StrobeDurationFilter&&)	16	static
 ../Core/Inc/Motherboard.hpp:920:8:MotherboardContext& MotherboardContext::operator=(MotherboardContext&&)	16	static
-../Core/Src/MotherboardMain.cpp:14:5:int MotherboardInit(MotherboardConfig)	145240	static
-../Core/Src/MotherboardMain.cpp:21:5:int MotherboardTick()	1416	static
-../Core/Src/MotherboardMain.cpp:72:6:void MotherboardOnStrobe()	8	static
-../Core/Src/MotherboardMain.cpp:82:6:void MotherboardOnBodyRecieveComplete()	8	static
-../Core/Src/MotherboardMain.cpp:86:6:void MotherboardOnHeadRecieveComplete()	8	static
-../Core/Src/MotherboardMain.cpp:90:6:void MotherboardOnHeadTransmitComplete()	8	static
-../Core/Src/MotherboardMain.cpp:94:6:void MotherboardOnBodyTransmitComplete()	8	static
-../Core/Src/MotherboardMain.cpp:97:6:void MotherboardOnBodyTimerTick()	8	static
-../Core/Src/MotherboardMain.cpp:101:6:void MotherboardOnImuTimerTick()	4	static
+../Core/Src/MotherboardMain.cpp:15:5:int MotherboardInit(MotherboardConfig)	145240	static
+../Core/Src/MotherboardMain.cpp:22:5:int MotherboardTick()	1416	static
+../Core/Src/MotherboardMain.cpp:73:6:void MotherboardOnStrobe()	8	static
+../Core/Src/MotherboardMain.cpp:83:6:void MotherboardOnBodyRecieveComplete()	8	static
+../Core/Src/MotherboardMain.cpp:87:6:void MotherboardOnHeadRecieveComplete()	8	static
+../Core/Src/MotherboardMain.cpp:91:6:void MotherboardOnHeadTransmitComplete()	8	static
+../Core/Src/MotherboardMain.cpp:95:6:void MotherboardOnBodyTransmitComplete()	8	static
+../Core/Src/MotherboardMain.cpp:98:6:void MotherboardOnBodyTimerTick()	8	static
+../Core/Src/MotherboardMain.cpp:102:6:void MotherboardOnImuTimerTick()	4	static
 ../Core/Inc/Motherboard.hpp:68:7:bool FixedQueue<T, Capacity>::Push(const T&) [with T = Responce; unsigned int Capacity = 10]	16	static
 ../Core/Inc/Motherboard.hpp:90:7:bool FixedQueue<T, Capacity>::Empty() const [with T = Responce; unsigned int Capacity = 10]	16	static
 ../Core/Inc/Motherboard.hpp:85:11:const T& FixedQueue<T, Capacity>::Front() const [with T = Responce; unsigned int Capacity = 10]	16	static
@@ -661,6 +661,6 @@
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/bits/stl_algobase.h:680:2:static _Tp* std::__copy_move_backward<_IsMove, true, std::random_access_iterator_tag>::__copy_move_b(const _Tp*, const _Tp*, _Tp*) [with _Tp = IMUFrame; bool _IsMove = true]	32	static
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/bits/stl_algobase.h:415:2:static _Tp* std::__copy_move<_IsMove, true, std::random_access_iterator_tag>::__copy_m(const _Tp*, const _Tp*, _Tp*) [with _Tp = ServoDataFrame; bool _IsMove = true]	32	static
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/bits/stl_algobase.h:680:2:static _Tp* std::__copy_move_backward<_IsMove, true, std::random_access_iterator_tag>::__copy_move_b(const _Tp*, const _Tp*, _Tp*) [with _Tp = ServoDataFrame; bool _IsMove = true]	32	static
-../Core/Src/MotherboardMain.cpp:103:1:void __static_initialization_and_destruction_0(int, int)	16	static
-../Core/Src/MotherboardMain.cpp:103:1:cpp)	8	static
-../Core/Src/MotherboardMain.cpp:103:1:cpp)	8	static
+../Core/Src/MotherboardMain.cpp:104:1:void __static_initialization_and_destruction_0(int, int)	16	static
+../Core/Src/MotherboardMain.cpp:104:1:cpp)	8	static
+../Core/Src/MotherboardMain.cpp:104:1:cpp)	8	static
