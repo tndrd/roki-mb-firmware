@@ -5,9 +5,9 @@
  *      Author: tndrd
  */
 
+#include <OldMotherboard.hpp>
 #include "MotherboardMain.h"
-#include "Motherboard.hpp"
-#include "NEWMotherboard.hpp"
+#include "../../roki-mb-firmware/Inc/Motherboard.hpp"
 
 static MotherboardContext mbCtx;
 static MotherboardRequestHandler mbHandler;
