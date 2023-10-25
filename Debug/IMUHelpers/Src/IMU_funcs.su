@@ -1,0 +1,13 @@
+../IMUHelpers/Src/IMU_funcs.cpp:45:6:)	16	static
+../IMUHelpers/Src/IMU_funcs.cpp:58:6:void spi_init(SPI_HandleTypeDef*)	16	static
+../IMUHelpers/Src/IMU_funcs.cpp:69:8:int8_t spiTransmit(uint8_t*, uint16_t)	16	static
+../IMUHelpers/Src/IMU_funcs.cpp:85:8:int8_t spiReceiv(uint8_t*, uint16_t)	16	static
+../IMUHelpers/Src/IMU_funcs.cpp:104:8:int8_t bhy2_spi_read(uint8_t, uint8_t*, uint32_t, void*)	24	static
+../IMUHelpers/Src/IMU_funcs.cpp:142:8:int8_t bhy2_spi_write(uint8_t, const uint8_t*, uint32_t, void*)	24	static
+../IMUHelpers/Src/IMU_funcs.cpp:177:6:void i2c_init(I2C_HandleTypeDef*, uint8_t)	16	static
+../IMUHelpers/Src/IMU_funcs.cpp:183:9:uint8_t summir(uint8_t, uint8_t)	16	static
+../IMUHelpers/Src/IMU_funcs.cpp:195:8:int8_t i2cTransmit(uint8_t*, uint16_t)	16	static
+../IMUHelpers/Src/IMU_funcs.cpp:212:8:int8_t i2cReceiv(uint8_t*, uint16_t)	16	static
+../IMUHelpers/Src/IMU_funcs.cpp:233:8:int8_t bhy2_i2c_read(uint8_t, uint8_t*, uint32_t, void*)	24	static
+../IMUHelpers/Src/IMU_funcs.cpp:257:8:int8_t bhy2_i2c_write(uint8_t, const uint8_t*, uint32_t, void*)	24	static
+../IMUHelpers/Src/IMU_funcs.cpp:283:6:void bhy2_delay_us(uint32_t, void*)	16	static,ignoring_inline_asm

@@ -1,0 +1,33 @@
+../roki-mb-service/src/MbMessages.cpp:6:6:void Roki::Messages::Byte::Serialize(uint8_t*) const	16	static
+../roki-mb-service/src/MbMessages.cpp:12:6:static Roki::Messages::Byte Roki::Messages::Byte::Deserialize(const uint8_t*)	24	static
+../roki-mb-service/src/MbMessages.cpp:21:8:size_t Roki::Messages::Byte::GetPackedSize() const	16	static
+../roki-mb-service/src/MbMessages.cpp:23:6:void Roki::Messages::Empty::Serialize(uint8_t*) const	16	static
+../roki-mb-service/src/MbMessages.cpp:25:7:static Roki::Messages::Empty Roki::Messages::Empty::Deserialize(const uint8_t*)	16	static
+../roki-mb-service/src/MbMessages.cpp:30:8:size_t Roki::Messages::Empty::GetPackedSize() const	16	static
+../roki-mb-service/src/MbMessages.cpp:32:6:void Roki::Messages::IMUFrameMsg::Serialize(uint8_t*) const	24	static
+../roki-mb-service/src/MbMessages.cpp:59:13:static Roki::Messages::IMUFrameMsg Roki::Messages::IMUFrameMsg::Deserialize(const uint8_t*)	24	static
+../roki-mb-service/src/MbMessages.cpp:93:8:size_t Roki::Messages::IMUFrameMsg::GetPackedSize() const	16	static
+../roki-mb-service/src/MbMessages.cpp:97:6:void Roki::Messages::FrameContainerInfo::Serialize(uint8_t*) const	16	static
+../roki-mb-service/src/MbMessages.cpp:110:20:static Roki::Messages::FrameContainerInfo Roki::Messages::FrameContainerInfo::Deserialize(const uint8_t*)	16	static
+../roki-mb-service/src/MbMessages.cpp:127:8:size_t Roki::Messages::FrameContainerInfo::GetPackedSize() const	16	static
+../roki-mb-service/src/MbMessages.cpp:131:6:void Roki::Messages::FrameNumber::Serialize(uint8_t*) const	16	static
+../roki-mb-service/src/MbMessages.cpp:136:13:static Roki::Messages::FrameNumber Roki::Messages::FrameNumber::Deserialize(const uint8_t*)	24	static
+../roki-mb-service/src/MbMessages.cpp:144:8:size_t Roki::Messages::FrameNumber::GetPackedSize() const	16	static
+../roki-mb-service/src/MbMessages.cpp:146:6:void Roki::Messages::StrobeFilterConfig::Serialize(uint8_t*) const	16	static
+../roki-mb-service/src/MbMessages.cpp:152:20:static Roki::Messages::StrobeFilterConfig Roki::Messages::StrobeFilterConfig::Deserialize(const uint8_t*)	24	static
+../roki-mb-service/src/MbMessages.cpp:162:8:size_t Roki::Messages::StrobeFilterConfig::GetPackedSize() const	16	static
+../roki-mb-service/src/MbMessages.cpp:164:6:void Roki::Messages::Version::Serialize(uint8_t*) const	16	static
+../roki-mb-service/src/MbMessages.cpp:171:9:static Roki::Messages::Version Roki::Messages::Version::Deserialize(const uint8_t*)	24	static
+../roki-mb-service/src/MbMessages.cpp:180:8:size_t Roki::Messages::Version::GetPackedSize() const	16	static
+../roki-mb-service/src/MbMessages.cpp:182:6:void Roki::Messages::BodyQueueInfo::Serialize(uint8_t*) const	16	static
+../roki-mb-service/src/MbMessages.cpp:192:15:static Roki::Messages::BodyQueueInfo Roki::Messages::BodyQueueInfo::Deserialize(const uint8_t*)	24	static
+../roki-mb-service/src/MbMessages.cpp:206:8:size_t Roki::Messages::BodyQueueInfo::GetPackedSize() const	16	static
+../roki-mb-service/src/MbMessages.cpp:208:6:void Roki::Messages::PeriodMs::Serialize(uint8_t*) const	16	static
+../roki-mb-service/src/MbMessages.cpp:213:10:static Roki::Messages::PeriodMs Roki::Messages::PeriodMs::Deserialize(const uint8_t*)	24	static
+../roki-mb-service/src/MbMessages.cpp:222:8:size_t Roki::Messages::PeriodMs::GetPackedSize() const	16	static
+../roki-mb-service/src/MbMessages.cpp:224:6:void Roki::Messages::BodyRequest::Serialize(uint8_t*) const	16	static
+../roki-mb-service/src/MbMessages.cpp:232:13:static Roki::Messages::BodyRequest Roki::Messages::BodyRequest::Deserialize(const uint8_t*)	16	static
+../roki-mb-service/src/MbMessages.cpp:244:8:size_t Roki::Messages::BodyRequest::GetPackedSize() const	16	static
+../roki-mb-service/src/MbMessages.cpp:248:6:void Roki::Messages::BodyResponce::Serialize(uint8_t*) const	16	static
+../roki-mb-service/src/MbMessages.cpp:254:14:static Roki::Messages::BodyResponce Roki::Messages::BodyResponce::Deserialize(const uint8_t*)	16	static
+../roki-mb-service/src/MbMessages.cpp:264:8:size_t Roki::Messages::BodyResponce::GetPackedSize() const	16	static

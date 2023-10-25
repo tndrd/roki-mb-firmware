@@ -1,7 +1,7 @@
 ../Core/Src/main.c:71:5:main	80	static
-../Core/Src/main.c:158:6:SystemClock_Config	128	static
-../Core/Src/main.c:225:6:HAL_COMP_TriggerCallback	16	static
-../Core/Src/main.c:230:6:HAL_UART_RxCpltCallback	16	static
-../Core/Src/main.c:237:6:HAL_UART_TxCpltCallback	16	static
-../Core/Src/main.c:244:6:HAL_TIM_PeriodElapsedCallback	16	static
-../Core/Src/main.c:258:6:Error_Handler	4	static,ignoring_inline_asm
+../Core/Src/main.c:146:6:SystemClock_Config	128	static
+../Core/Src/main.c:213:6:HAL_COMP_TriggerCallback	16	static
+../Core/Src/main.c:218:6:HAL_UART_RxCpltCallback	16	static
+../Core/Src/main.c:223:6:HAL_UART_TxCpltCallback	16	static
+../Core/Src/main.c:228:6:HAL_TIM_PeriodElapsedCallback	16	static
+../Core/Src/main.c:242:6:Error_Handler	4	static,ignoring_inline_asm

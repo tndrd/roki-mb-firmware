@@ -1,0 +1,7 @@
+../IMUHelpers/Src/bhy2_parse.c:43:6:bhy2_parse_temperature_celsius	24	static
+../IMUHelpers/Src/bhy2_parse.c:51:6:bhy2_parse_humidity	24	static
+../IMUHelpers/Src/bhy2_parse.c:58:6:bhy2_parse_pressure	24	static
+../IMUHelpers/Src/bhy2_parse.c:66:6:bhy2_parse_altitude	16	static
+../IMUHelpers/Src/bhy2_parse.c:71:6:bhy2_parse_quaternion	16	static
+../IMUHelpers/Src/bhy2_parse.c:80:6:bhy2_parse_xyz	16	static
+../IMUHelpers/Src/bhy2_parse.c:87:6:bhy2_parse_orientation	16	static
