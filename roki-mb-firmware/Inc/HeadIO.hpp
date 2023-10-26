@@ -100,8 +100,13 @@ public:
 			}
 			case PS::SIZE: {
 				CurrentRequest.Size = Get1();
-				State = PS::DATA;
-				ReceiveData();
+				if (CurrentRequest.Size > 0) {
+					State = PS::DATA;
+					ReceiveData();
+				} else {
+					State = PS::SOM3;
+					Receive1();
+				}
 				break;
 			}
 			case PS::DATA: {
