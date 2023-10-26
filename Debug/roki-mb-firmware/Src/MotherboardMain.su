@@ -22,19 +22,19 @@
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:69:8:void HeadIO::Listener::HandleBadRequest()	280	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:77:8:void HeadIO::Listener::Callback()	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/FixedQueue.hpp:9:7:FixedQueue<HeadIO::Request, 4>::FixedQueue()	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:125:12:HeadIO::Listener::Listener(UART_HandleTypeDef*)	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:130:8:void HeadIO::Listener::Init()	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:134:8:bool HeadIO::Listener::HasRequest()	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:138:11:HeadIO::Request HeadIO::Listener::GetRequest()	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:145:8:void HeadIO::Listener::RxCpltCallback()	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:158:8:void HeadIO::Sender::Send(const HeadIO::Responce&)	32	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:176:8:void HeadIO::Sender::Callback()	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:130:12:HeadIO::Listener::Listener(UART_HandleTypeDef*)	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:135:8:void HeadIO::Listener::Init()	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:139:8:bool HeadIO::Listener::HasRequest()	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:143:11:HeadIO::Request HeadIO::Listener::GetRequest()	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:150:8:void HeadIO::Listener::RxCpltCallback()	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:163:8:void HeadIO::Sender::Send(const HeadIO::Responce&)	32	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:181:8:void HeadIO::Sender::Callback()	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/FixedQueue.hpp:9:7:FixedQueue<HeadIO::Responce, 4>::FixedQueue()	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:181:12:HeadIO::Sender::Sender(UART_HandleTypeDef*)	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:186:8:void HeadIO::Sender::AddResponce(const HeadIO::Responce&)	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:190:8:void HeadIO::Sender::CheckTimer()	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:200:8:void HeadIO::Sender::TxCpltCallback()	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:208:11:HeadIO::HeadIO(UART_HandleTypeDef*)	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:186:12:HeadIO::Sender::Sender(UART_HandleTypeDef*)	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:191:8:void HeadIO::Sender::AddResponce(const HeadIO::Responce&)	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:195:8:void HeadIO::Sender::CheckTimer()	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:205:8:void HeadIO::Sender::TxCpltCallback()	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:213:11:HeadIO::HeadIO(UART_HandleTypeDef*)	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:22:7:void BodyQueue::Callback()	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/FixedQueue.hpp:9:7:FixedQueue<BodyQueue::Request, 500>::FixedQueue()	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:29:2:BodyQueue::BodyQueue(size_t)	16	static
@@ -44,7 +44,8 @@
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:50:7:void BodyQueue::AddRequest(const BodyQueue::Request&)	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:55:7:void BodyQueue::SetPeriod(size_t)	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:60:9:size_t BodyQueue::GetSize() const	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:64:7:void BodyQueue::TimCallback()	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:64:9:size_t BodyQueue::GetCapacity() const	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:68:7:void BodyQueue::TimCallback()	16	static
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/new:174:33:void* operator new(std::size_t, void*)	16	static
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/bits/stl_deque.h:96:3:constexpr std::size_t std::__deque_buf_size(std::size_t)	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/StrobeFilter.hpp:30:7:void StrobeFilter::Callback()	32	static
