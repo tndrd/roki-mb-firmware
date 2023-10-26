@@ -231,8 +231,8 @@ HANDLER(BodySendQueue) {
 }
 
 HANDLER(GetBodyQueueInfo) {
-	responce.NumRequests = ctx.BQueue.GetSize();
-	responce.NumResponces = 0; // Placeholder
+	responce.Size = ctx.BQueue.GetSize();
+	responce.Capacity= ctx.BQueue.GetCapacity(); // Placeholder
 	return Errors::Success;
 }
 

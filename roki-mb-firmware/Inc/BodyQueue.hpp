@@ -61,6 +61,10 @@ public:
 		return Requests.GetSize();
 	}
 
+	size_t GetCapacity() const {
+		return BodyQueueMaxSize;
+	}
+
 	void TimCallback() {
 		Callback();
 	}
