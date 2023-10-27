@@ -175,7 +175,7 @@ public:
 
 			Buffer[bufSize - 1] = SOM3Val;
 
-			HAL_UART_Transmit_IT(Uart, Buffer.data(), Buffer.size());
+			HAL_UART_Transmit_IT(Uart, Buffer.data(), bufSize);
 		}
 
 		void Callback() {
