@@ -55,6 +55,7 @@ public:
 	void SetPeriod(size_t periodMs) {
 		assert(periodMs > 0);
 		Period = periodMs;
+		Counter = 0;
 	}
 
 	size_t GetSize() const {
