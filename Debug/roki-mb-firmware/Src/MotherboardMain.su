@@ -1,9 +1,9 @@
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/bits/std_abs.h:56:3:long int std::abs(long int)	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyClient.hpp:28:9:BodyClient::Status BodyClient::TrySynchronize()	32	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyClient.hpp:52:7:bool BodyClient::RxIsNack() const	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyClient.hpp:54:7:bool BodyClient::RxIsNack() const	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyMsgs.hpp:15:10:constexpr BodyMsgs::Responces::KondoNACK::KondoNACK()	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyClient.hpp:57:11:BodyClient::BodyClient(UART_HandleTypeDef*, size_t, size_t)	24	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyClient.hpp:63:9:BodyClient::Status BodyClient::Synchronize(const uint8_t*, uint8_t, uint8_t*, uint8_t)	32	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyClient.hpp:59:11:BodyClient::BodyClient(UART_HandleTypeDef*, size_t, size_t)	24	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyClient.hpp:65:9:BodyClient::Status BodyClient::Synchronize(const uint8_t*, uint8_t, uint8_t*, uint8_t)	32	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/IMUDevice.hpp:36:7:void IMUDevice::Callback()	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/IMUDevice.hpp:40:7:void IMUDevice::Update()	32	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/IMUDevice.hpp:61:14:static void IMUDevice::ParseFrame(const bhy2_fifo_parse_data_info*, void*)	88	static
@@ -43,9 +43,9 @@
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:46:7:bool BodyQueue::IsFull() const	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:50:7:void BodyQueue::AddRequest(const BodyQueue::Request&)	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:55:7:void BodyQueue::SetPeriod(size_t)	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:60:9:size_t BodyQueue::GetSize() const	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:64:9:size_t BodyQueue::GetCapacity() const	16	static
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:68:7:void BodyQueue::TimCallback()	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:61:9:size_t BodyQueue::GetSize() const	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:65:9:size_t BodyQueue::GetCapacity() const	16	static
+/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:69:7:void BodyQueue::TimCallback()	16	static
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/new:174:33:void* operator new(std::size_t, void*)	16	static
 /home/tndrd/st/stm32cubeide_1.10.1_2/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.linux64_1.0.0.202111181127/tools/arm-none-eabi/include/c++/10.3.1/bits/stl_deque.h:96:3:constexpr std::size_t std::__deque_buf_size(std::size_t)	16	static
 /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/StrobeFilter.hpp:30:7:void StrobeFilter::Callback()	32	static
