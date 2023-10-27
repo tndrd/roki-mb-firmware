@@ -39,6 +39,8 @@ private:
 		uint8_t *rxPtr = RxBuf + NACK.Size;
 		uint8_t rxRem = RxSize - NACK.Size;
 
+		if (rxRem == 0) return Status::Success;
+
 		status = HAL_UART_Receive(Uart, rxPtr, rxRem, Timeout);
 
 		if (status == HAL_TIMEOUT)
