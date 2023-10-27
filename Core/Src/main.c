@@ -79,23 +79,6 @@ int main(void) {
 	HAL_Init();
 
 	/* USER CODE BEGIN Init */
-	struct MotherboardConfig config;
-	config.HeadIO.Uart = &huart3;
-
-	config.BodyClient.Uart = &huart8;
-	config.BodyClient.NAttempts = 5;
-	config.BodyClient.TimeoutMs = 2;
-
-	config.IMUDevice.SampleRate = 800.0;
-	config.IMUDevice.ReportLatency = 0;
-	config.IMUDevice.Spi = &hspi1;
-
-	config.BodyQueue.Period = 20;
-
-	config.StrobeFilter.TargetDuration = 10;
-	config.StrobeFilter.DurationThreshold = 0;
-
-	MotherboardInit(config);
 	/* USER CODE END Init */
 
 	/* Configure the system clock */
@@ -122,6 +105,25 @@ int main(void) {
 	MX_DAC1_Init();
 	MX_UART8_Init();
 	/* USER CODE BEGIN 2 */
+
+	struct MotherboardConfig config;
+	config.HeadIO.Uart = &huart3;
+
+	config.BodyClient.Uart = &huart8;
+	config.BodyClient.NAttempts = 5;
+	config.BodyClient.TimeoutMs = 2;
+
+	config.IMUDevice.SampleRate = 800.0;
+	config.IMUDevice.ReportLatency = 0;
+	config.IMUDevice.Spi = &hspi1;
+
+	config.BodyQueue.Period = 20;
+
+	config.StrobeFilter.TargetDuration = 10;
+	config.StrobeFilter.DurationThreshold = 0;
+
+	MotherboardInit(config);
+
 	HAL_DAC_Start(&hdac1, DAC1_CHANNEL_1);
 	HAL_DAC_SetValue(&hdac1, DAC1_CHANNEL_1, DAC_ALIGN_12B_R, 4095 * (1 / 3.3));
 	HAL_TIM_Base_Start_IT(&htim3);
