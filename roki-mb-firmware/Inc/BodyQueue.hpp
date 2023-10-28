@@ -10,19 +10,31 @@ public:
 		BufferType Data;
 		uint8_t TxSize;
 		uint8_t RxSize;
+		uint8_t Pause;
 	};
 
 private:
 	FixedQueue<Request, BodyQueueMaxSize> Requests;
+
+	/* Concurrent data */
 	size_t Period;
 	size_t Counter = 0;
+	size_t Pause = 0;
 
+	/* Condition variable */
 	bool Ready = true;
+
 private:
 	void Callback() {
 		Counter = (Counter + 1) % Period;
-		if (Counter == 0)
-			Ready = true;
+		if (Counter != 0) return;
+
+		if (Pause != 0) {
+			Pause--;
+			return;
+		}
+
+		Ready = true;
 	}
 
 public:
@@ -39,7 +51,13 @@ public:
 		assert(IsReady());
 		Request request = Requests.Front();
 		Requests.Pop();
+
+		__disable_irq();
+		Pause = request.Pause;
+		__enable_irq();
+
 		Ready = false;
+
 		return request;
 	}
 
@@ -54,8 +72,12 @@ public:
 
 	void SetPeriod(size_t periodMs) {
 		assert(periodMs > 0);
+
+		__disable_irq();
 		Period = periodMs;
 		Counter = 0;
+		Pause = 0;
+		__enable_irq();
 	}
 
 	size_t GetSize() const {
@@ -64,6 +86,15 @@ public:
 
 	size_t GetCapacity() const {
 		return BodyQueueMaxSize;
+	}
+
+	size_t Clear() {
+		Requests.Clear();
+
+		__disable_irq();
+		Counter = 0;
+		Pause = 0;
+		__enable_irq();
 	}
 
 	void TimCallback() {

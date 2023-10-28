@@ -40,12 +40,15 @@ public:
 		using PS = PackageState;
 
 	private:
-		FixedQueue<Request, HeadRequestQueueSize> Requests;
-
 		UART_HandleTypeDef *Uart;
+
+		/* Callback-local */
 		uint8_t CurrentValue;
 		Request CurrentRequest;
 		PackageState State;
+
+		/* Concurrent data */
+		FixedQueue<Request, HeadRequestQueueSize> Requests;
 
 	private:
 		void Receive1() {

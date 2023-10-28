@@ -12,19 +12,19 @@ private:
 	};
 
 private:
+	/* Callback-local */
 	uint32_t FallTime = 0;
 	uint32_t RiseTime = 0;
 	PulseState State = PulseState::Down;
+	size_t CurrentSeq = 0;
+	const IMUDevice *IMU;
 
+	/* Concurrent */
 	uint32_t DurationThreshold;
 	uint32_t TargetDuration;
-
 	float StrobeDuration = 0;
 
 	std::queue<size_t> StrobeQueue;
-	size_t CurrentSeq = 0;
-
-	const IMUDevice *IMU;
 
 private:
 	void Callback() {
@@ -68,8 +68,10 @@ public:
 	}
 
 	void Configure(uint8_t targetDuration, uint8_t durationThreshold) {
+		__disable_irq();
 		TargetDuration = targetDuration;
 		DurationThreshold = durationThreshold;
+		__enable_irq();
 	}
 
 	float GetStrobeDuration() const {

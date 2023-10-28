@@ -111,6 +111,8 @@ public:
 			return GenericHandler<Proc::SetBodyStrobeOffset>(ctx, request);
 		case PID::SetIMUStrobeOffset:
 			return GenericHandler<Proc::SetIMUStrobeOffset>(ctx, request);
+		case PID::ResetBodyQueue:
+			return GenericHandler<Proc::ResetBodyQueue>(ctx, request);
 
 		default:
 			return CreateError(Errors::UnknownProcedure);
@@ -221,9 +223,10 @@ HANDLER(BodySendQueue) {
 
 	BodyQueue::Request newReq;
 
-	memcpy(newReq.Data.data(), request.Data, request.RequestSize);
-	newReq.TxSize = request.RequestSize;
-	newReq.RxSize = request.ResponceSize;
+	memcpy(newReq.Data.data(), request.Request.Data, request.Request.RequestSize);
+	newReq.TxSize = request.Request.RequestSize;
+	newReq.RxSize = request.Request.ResponceSize;
+	newReq.Pause = request.Pause;
 
 	ctx.BQueue.AddRequest(newReq);
 
@@ -240,6 +243,11 @@ HANDLER(SetBodyQueuePeriod) {
 	if (request.Ms == 0)
 		return Errors::BadBodyQueuePeriod;
 	ctx.BQueue.SetPeriod(request.Ms);
+	return Errors::Success;
+}
+
+HANDLER(ResetBodyQueue) {
+	ctx.BQueue.Clear();
 	return Errors::Success;
 }
 

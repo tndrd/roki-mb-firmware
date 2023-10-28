@@ -19,17 +19,19 @@ public:
 
 		Buffer[Head] = rhs;
 		Head = (Head + 1) % Capacity;
+
 		Size++;
 	}
 
 	void Pop() {
 		assert(Size != 0);
-		Tail = (Tail + 1) % Capacity;
 		Size--;
+		Tail = (Tail + 1) % Capacity;
 	}
 
 	void Clear() {
 		Size = 0;
+
 		Head = 0;
 		Tail = 0;
 		Buffer = { };

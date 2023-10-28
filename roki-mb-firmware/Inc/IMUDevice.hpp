@@ -18,18 +18,18 @@ public:
 	using Frame = Roki::Messages::IMUFrameMsg;
 
 private:
+	/* Main-local */
 	static constexpr size_t WorkBufferSize = 2048;
 	std::array<uint8_t, WorkBufferSize> WorkBuffer;
 	static const size_t CallbackDataSize = 11;
-
 	bhy2_dev bhy2;
 	SPI_HandleTypeDef *Spi;
-
 	float SampleRate;
 	uint32_t ReportLatency;
 	Frame CurrentFrame;
 	size_t CurrentSeq = 0;
 
+	/* Condition variable */
 	bool DoUpdate = false;
 
 private:
@@ -40,6 +40,7 @@ private:
 	void Update() {
 		if (!DoUpdate)
 			return;
+		DoUpdate = false;
 
 		uint8_t interruptStatus = 0;
 		bhy2_get_interrupt_status(&interruptStatus, &bhy2);
@@ -55,7 +56,6 @@ private:
 		assert(status == BHY2_OK);
 
 		CurrentSeq++;
-		DoUpdate = false;
 	}
 
 	static void ParseFrame(const bhy2_fifo_parse_data_info *cbInfo,
