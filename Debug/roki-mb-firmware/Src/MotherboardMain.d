@@ -1,7 +1,7 @@
 roki-mb-firmware/Src/MotherboardMain.o: \
  ../roki-mb-firmware/Src/MotherboardMain.cpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/MotherboardMain.h \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/MotherboardConfig.h \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/MotherboardMain.h \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/MotherboardConfig.h \
  ../Core/Inc/usart.h ../Core/Inc/main.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h \
  ../Core/Inc/stm32h7xx_hal_conf.h \
@@ -43,32 +43,32 @@ roki-mb-firmware/Src/MotherboardMain.o: \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/Motherboard.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/RequestHandler.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/MotherboardContext.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyClient.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyMsgs.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/FrameQueue.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/FixedQueue.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-service/inc/MbMessages.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/IMUDevice.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/bhy2.h \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/../../IMUHelpers/Inc/bhy2_defs.h \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/bhy2_hif.h \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/bhy2_parse.h \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/../../IMUHelpers/Inc/bhy2.h \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/bhy2_defs.h \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/Bosch_SHUTTLE_BHI260_2.fw.h \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/IMU_funcs.h \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/Motherboard.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/RequestHandler.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/MotherboardContext.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/BodyClient.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/BodyMsgs.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/FrameQueue.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/FixedQueue.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-service/inc/MbMessages.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/IMUDevice.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/bhy2.h \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/../../IMUHelpers/Inc/bhy2_defs.h \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/bhy2_hif.h \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/bhy2_parse.h \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/../../IMUHelpers/Inc/bhy2.h \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/bhy2_defs.h \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/Bosch_SHUTTLE_BHI260_2.fw.h \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/IMU_funcs.h \
  ../Core/Inc/spi.h ../Core/Inc/i2c.h \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/Common.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/StrobeFilter.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/StrobeObservers.hpp \
- /home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-service/inc/MbService.hpp
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/MotherboardMain.h:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/MotherboardConfig.h:
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/HeadIO.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/Common.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/BodyQueue.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/StrobeFilter.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/StrobeObservers.hpp \
+ /home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-service/inc/MbService.hpp
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/MotherboardMain.h:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/MotherboardConfig.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
@@ -111,28 +111,28 @@ roki-mb-firmware/Src/MotherboardMain.o: \
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_ll_usb.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pcd_ex.h:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/Motherboard.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/RequestHandler.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/MotherboardContext.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyClient.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyMsgs.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/FrameQueue.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/FixedQueue.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-service/inc/MbMessages.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/IMUDevice.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/bhy2.h:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/../../IMUHelpers/Inc/bhy2_defs.h:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/bhy2_hif.h:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/bhy2_parse.h:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/../../IMUHelpers/Inc/bhy2.h:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/bhy2_defs.h:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/Bosch_SHUTTLE_BHI260_2.fw.h:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/IMUHelpers/Inc/IMU_funcs.h:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/Motherboard.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/RequestHandler.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/MotherboardContext.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/BodyClient.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/BodyMsgs.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/FrameQueue.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/FixedQueue.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-service/inc/MbMessages.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/IMUDevice.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/bhy2.h:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/../../IMUHelpers/Inc/bhy2_defs.h:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/bhy2_hif.h:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/bhy2_parse.h:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/../../IMUHelpers/Inc/bhy2.h:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/bhy2_defs.h:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/Bosch_SHUTTLE_BHI260_2.fw.h:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/IMUHelpers/Inc/IMU_funcs.h:
 ../Core/Inc/spi.h:
 ../Core/Inc/i2c.h:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/HeadIO.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/Common.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/BodyQueue.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/StrobeFilter.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-firmware/Inc/StrobeObservers.hpp:
-/home/tndrd/STM32CubeIDE/workspace_1.10.1/StarkitMotherboard/roki-mb-service/inc/MbService.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/HeadIO.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/Common.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/BodyQueue.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/StrobeFilter.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-firmware/Inc/StrobeObservers.hpp:
+/home/tndrd/STM32CubeIDE/workspace_1.15.1/roki-mb-firmware/roki-mb-service/inc/MbService.hpp:

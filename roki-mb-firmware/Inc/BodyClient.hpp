@@ -33,8 +33,10 @@ private:
 			return Status::ACKTimeout;
 		if (status != HAL_OK)
 			return Status::Unknown;
-		if (RxIsNack())
+		if (RxIsNack()) {
+			HAL_UART_Receive(Uart, RxBuf, RxSize, Timeout);
 			return Status::Nack;
+		}
 
 		uint8_t *rxPtr = RxBuf + NACK.Size;
 		uint8_t rxRem = RxSize - NACK.Size;
