@@ -11,20 +11,21 @@ private:
 	BufferType DummyBuf;
 private:
 	static void BodyStrobeCallback(MotherboardContext &ctx) {
-		struct FrameQueues::BodyResponce responce;
-		auto request = BodyMsgs::Requests::GetAllPos { };
+		if (!ctx.BSCallback.Enabled) return;
 
-		auto &txData = request.Data;
-		auto &txSize = request.RequestSize;
+		struct FrameQueues::BodyResponce responce;
+
+		auto txData = ctx.BSCallback.Request.data();
+		auto txSize = ctx.BSCallback.ReqSize;
 		auto rxData = responce.Data.data();
-		auto &rxSize = request.ResponceSize;
+		auto rxSize = ctx.BSCallback.RspSize;
 
 		BodyClient::Status status;
 		status = ctx.Body.Synchronize(txData, txSize, rxData, rxSize);
 
 		responce.Status = status;
 		if (status == BodyClient::Status::Success)
-			responce.Size = request.ResponceSize;
+			responce.Size = rxSize;
 		else
 			responce.Size = 0;
 

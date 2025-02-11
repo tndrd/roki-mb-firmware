@@ -12,7 +12,6 @@ struct MotherboardConfig {
 	struct {
 		UART_HandleTypeDef* Uart;
 		size_t TimeoutMs;
-		size_t NAttempts;
 	} BodyClient;
 
 	struct {

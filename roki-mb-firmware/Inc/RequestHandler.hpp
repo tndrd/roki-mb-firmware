@@ -2,15 +2,15 @@
 #define REQUEST_HANDLER
 
 #include "MotherboardContext.hpp"
-#include "MbService.hpp"
+#include "roki-mb-service/MbService.hpp"
 
-namespace Msgs = Roki::Messages;
+namespace Msgs = MbInterface::Messages;
 
 struct RequestHandler {
 private:
 	using Request = HeadIO::Request;
 	using Responce = HeadIO::Responce;
-	using Service = Roki::MbService;
+	using Service = MbInterface::MbService;
 
 	using Proc = Service::Procedures;
 	using Errors = Service::ErrorCodes;
@@ -113,6 +113,16 @@ public:
 			return GenericHandler<Proc::SetIMUStrobeOffset>(ctx, request);
 		case PID::ResetBodyQueue:
 			return GenericHandler<Proc::ResetBodyQueue>(ctx, request);
+		case PID::SetBodyTimeout:
+			return GenericHandler<Proc::SetBodyTimeout>(ctx, request);
+		case PID::EnableBodyARQ:
+			return GenericHandler<Proc::EnableBodyARQ>(ctx, request);
+		case PID::DisableBodyARQ:
+			return GenericHandler<Proc::DisableBodyARQ>(ctx, request);
+		case PID::SetBodyStrobeCallback:
+			return GenericHandler<Proc::SetBodyStrobeCallback>(ctx, request);
+		case PID::ResetBodyStrobeCallback:
+			return GenericHandler<Proc::ResetBodyStrobeCallback>(ctx, request);
 
 		default:
 			return CreateError(Errors::UnknownProcedure);
@@ -248,6 +258,41 @@ HANDLER(SetBodyQueuePeriod) {
 
 HANDLER(ResetBodyQueue) {
 	ctx.BQueue.Clear();
+	return Errors::Success;
+}
+
+HANDLER(SetBodyTimeout) {
+	ctx.Body.SetTimeout(request.Value);
+	return Errors::Success;
+}
+
+HANDLER(EnableBodyARQ) {
+	ctx.Body.EnableARQ(request.NACK.Data, request.NACK.ResponceSize, request.AttemptC.Value);
+	return Errors::Success;
+}
+
+HANDLER(DisableBodyARQ) {
+	ctx.Body.DisableARQ();
+	return Errors::Success;
+}
+
+HANDLER(SetBodyStrobeCallback) {
+	__disable_irq();
+	ctx.BSCallback.Enabled = true;
+	ctx.BSCallback.ReqSize = request.RequestSize;
+	ctx.BSCallback.RspSize = request.ResponceSize;
+
+	memcpy(ctx.BSCallback.Request.data(), request.Data, request.RequestSize);
+	__enable_irq();
+
+	return Errors::Success;
+}
+
+HANDLER(ResetBodyStrobeCallback) {
+	__disable_irq();
+	ctx.BSCallback.Enabled = false;
+	__enable_irq();
+
 	return Errors::Success;
 }
 

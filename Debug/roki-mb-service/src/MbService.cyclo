@@ -1,5 +1,5 @@
-../roki-mb-service/src/MbService.cpp:5:9:static uint8_t Roki::MbService::ProcedureID::Serialize(Type)	1
-../roki-mb-service/src/MbService.cpp:6:6:static Roki::MbService::ProcedureID::Type Roki::MbService::ProcedureID::Deserialize(uint8_t)	1
-../roki-mb-service/src/MbService.cpp:8:9:static uint8_t Roki::MbService::ErrorCodes::Serialize(Type)	1
-../roki-mb-service/src/MbService.cpp:9:6:static Roki::MbService::ErrorCodes::Type Roki::MbService::ErrorCodes::Deserialize(uint8_t)	1
-../roki-mb-service/src/MbService.cpp:12:13:static const char* Roki::MbService::ErrorCodes::GetDescription(Type)	13
+../roki-mb-service/src/MbService.cpp:5:9:static uint8_t MbInterface::MbService::ProcedureID::Serialize(Type)	1
+../roki-mb-service/src/MbService.cpp:6:6:static MbInterface::MbService::ProcedureID::Type MbInterface::MbService::ProcedureID::Deserialize(uint8_t)	1
+../roki-mb-service/src/MbService.cpp:8:9:static uint8_t MbInterface::MbService::ErrorCodes::Serialize(Type)	1
+../roki-mb-service/src/MbService.cpp:9:6:static MbInterface::MbService::ErrorCodes::Type MbInterface::MbService::ErrorCodes::Deserialize(uint8_t)	1
+../roki-mb-service/src/MbService.cpp:12:13:static const char* MbInterface::MbService::ErrorCodes::GetDescription(Type)	14

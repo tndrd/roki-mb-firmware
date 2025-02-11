@@ -2,7 +2,7 @@
 #define FRAME_QUEUE
 
 #include "FixedQueue.hpp"
-#include "MbMessages.hpp"
+#include "roki-mb-service/MbMessages.hpp"
 
 template<typename T, size_t Capacity>
 struct FrameQueue {
@@ -42,7 +42,7 @@ public:
 	}
 
 public:
-	Roki::Messages::FrameContainerInfo GetInfo() const {
+	MbInterface::Messages::FrameContainerInfo GetInfo() const {
 		return {FirstSeq, Queue.GetSize(), Capacity};
 	}
 };

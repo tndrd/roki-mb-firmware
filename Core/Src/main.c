@@ -111,7 +111,6 @@ int main(void)
 	config.HeadIO.Uart = &huart3;
 
 	config.BodyClient.Uart = &huart8;
-	config.BodyClient.NAttempts = 5;
 	config.BodyClient.TimeoutMs = 200;
 
 	config.IMUDevice.SampleRate = 800.0;

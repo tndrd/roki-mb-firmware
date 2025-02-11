@@ -88,7 +88,7 @@ public:
 		return BodyQueueMaxSize;
 	}
 
-	size_t Clear() {
+	void Clear() {
 		Requests.Clear();
 
 		__disable_irq();

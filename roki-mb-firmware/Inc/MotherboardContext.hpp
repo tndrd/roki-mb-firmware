@@ -29,6 +29,14 @@ public:
 	}
 };
 
+struct BodyStrobeCallback {
+	bool Enabled = false;
+
+	BufferType Request;
+	uint8_t ReqSize;
+	uint8_t RspSize;
+};
+
 struct MotherboardContext {
 	struct VersionT {
 		uint8_t Major;
@@ -44,10 +52,11 @@ struct MotherboardContext {
 	StrobeFilter SFilter;
 	StrobeObservers SObservers;
 	FrameQueues FQueues;
+	BodyStrobeCallback BSCallback;
 
 	MotherboardContext(MotherboardConfig c) :
 			Head { c.HeadIO.Uart }, Body { c.BodyClient.Uart,
-					c.BodyClient.TimeoutMs, c.BodyClient.NAttempts }, BQueue {
+					c.BodyClient.TimeoutMs}, BQueue {
 					c.BodyQueue.Period }, IMU { c.IMUDevice.Spi,
 					c.IMUDevice.SampleRate, c.IMUDevice.ReportLatency }, SFilter {
 					c.StrobeFilter.TargetDuration,

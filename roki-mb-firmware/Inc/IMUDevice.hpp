@@ -11,11 +11,11 @@
 #include "Bosch_SHUTTLE_BHI260_2.fw.h"
 #include "IMU_funcs.h"
 
-#include "MbMessages.hpp"
+#include "roki-mb-service/MbMessages.hpp"
 
 class IMUDevice {
 public:
-	using Frame = Roki::Messages::IMUFrameMsg;
+	using Frame = MbInterface::Messages::IMUFrameMsg;
 
 private:
 	/* Main-local */
