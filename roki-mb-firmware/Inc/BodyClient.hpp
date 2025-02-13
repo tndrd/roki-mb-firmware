@@ -17,7 +17,7 @@ private:
 	bool ARQEnabled = false;
 	uint8_t NACKBuf[256] = { };
 	uint8_t NACKSize = 0;
-	size_t AttemptC = 0;
+	size_t AttemptC = 1;
 
 	const uint8_t *TxBuf;
 	uint8_t TxSize;
