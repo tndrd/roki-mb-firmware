@@ -43,7 +43,7 @@ public:
 
 public:
 	MbInterface::Messages::FrameContainerInfo GetInfo() const {
-		return {FirstSeq, Queue.GetSize(), Capacity};
+		return {FirstSeq, Queue.GetSize(), Capacity, false};
 	}
 };
 

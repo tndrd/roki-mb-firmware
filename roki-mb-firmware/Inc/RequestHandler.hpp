@@ -166,11 +166,13 @@ HANDLER(GetBodyFrame) {
 
 HANDLER(GetIMUContainerInfo) {
 	responce = ctx.FQueues.IMUFrames.GetInfo();
+	responce.Active = true;
 	return Errors::Success;
 }
 
 HANDLER(GetBodyContainerInfo) {
 	responce = ctx.FQueues.BodyPos.GetInfo();
+	responce.Active = ctx.BSCallback.Enabled;
 	return Errors::Success;
 }
 
@@ -233,7 +235,8 @@ HANDLER(BodySendQueue) {
 
 	BodyQueue::Request newReq;
 
-	memcpy(newReq.Data.data(), request.Request.Data, request.Request.RequestSize);
+	memcpy(newReq.Data.data(), request.Request.Data,
+			request.Request.RequestSize);
 	newReq.TxSize = request.Request.RequestSize;
 	newReq.RxSize = request.Request.ResponceSize;
 	newReq.Pause = request.Pause;
@@ -245,7 +248,7 @@ HANDLER(BodySendQueue) {
 
 HANDLER(GetBodyQueueInfo) {
 	responce.Size = ctx.BQueue.GetSize();
-	responce.Capacity= ctx.BQueue.GetCapacity(); // Placeholder
+	responce.Capacity = ctx.BQueue.GetCapacity(); // Placeholder
 	return Errors::Success;
 }
 
@@ -267,7 +270,8 @@ HANDLER(SetBodyTimeout) {
 }
 
 HANDLER(EnableBodyARQ) {
-	ctx.Body.EnableARQ(request.NACK.Data, request.NACK.ResponceSize, request.AttemptC.Value);
+	ctx.Body.EnableARQ(request.NACK.Data, request.NACK.ResponceSize,
+			request.AttemptC.Value);
 	return Errors::Success;
 }
 
