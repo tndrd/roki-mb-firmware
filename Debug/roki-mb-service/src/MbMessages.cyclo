@@ -40,3 +40,9 @@
 ../roki-mb-service/src/MbMessages.cpp:313:6:void MbInterface::Messages::Word::Serialize(uint8_t*) const	1
 ../roki-mb-service/src/MbMessages.cpp:318:6:static MbInterface::Messages::Word MbInterface::Messages::Word::Deserialize(const uint8_t*)	1
 ../roki-mb-service/src/MbMessages.cpp:326:8:size_t MbInterface::Messages::Word::GetPackedSize() const	1
+../roki-mb-service/src/MbMessages.cpp:329:6:void MbInterface::Messages::DWord::Serialize(uint8_t*) const	1
+../roki-mb-service/src/MbMessages.cpp:334:7:static MbInterface::Messages::DWord MbInterface::Messages::DWord::Deserialize(const uint8_t*)	1
+../roki-mb-service/src/MbMessages.cpp:342:8:size_t MbInterface::Messages::DWord::GetPackedSize() const	1
+../roki-mb-service/src/MbMessages.cpp:345:6:void MbInterface::Messages::BodyUARTConfig::Serialize(uint8_t*) const	1
+../roki-mb-service/src/MbMessages.cpp:364:16:static MbInterface::Messages::BodyUARTConfig MbInterface::Messages::BodyUARTConfig::Deserialize(const uint8_t*)	1
+../roki-mb-service/src/MbMessages.cpp:387:8:size_t MbInterface::Messages::BodyUARTConfig::GetPackedSize() const	1

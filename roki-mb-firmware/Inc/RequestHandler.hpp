@@ -113,8 +113,8 @@ public:
 			return GenericHandler<Proc::SetIMUStrobeOffset>(ctx, request);
 		case PID::ResetBodyQueue:
 			return GenericHandler<Proc::ResetBodyQueue>(ctx, request);
-		case PID::SetBodyTimeout:
-			return GenericHandler<Proc::SetBodyTimeout>(ctx, request);
+		case PID::ConfigureBodyUART:
+			return GenericHandler<Proc::ConfigureBodyUART>(ctx, request);
 		case PID::EnableBodyARQ:
 			return GenericHandler<Proc::EnableBodyARQ>(ctx, request);
 		case PID::DisableBodyARQ:
@@ -264,9 +264,8 @@ HANDLER(ResetBodyQueue) {
 	return Errors::Success;
 }
 
-HANDLER(SetBodyTimeout) {
-	ctx.Body.SetTimeout(request.Value);
-	return Errors::Success;
+HANDLER(ConfigureBodyUART) {
+	return ctx.Body.ReconfigureUart(request);
 }
 
 HANDLER(EnableBodyARQ) {
