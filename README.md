@@ -23,7 +23,7 @@ This repository is the **MCU side** of a two-part system:
 
 ## Stack
 
-C++ · bare-metal STM32H743VI (Cortex-M7) · custom linker scripts (FLASH/RAM) ·
+C++ · bare-metal STM32H743VI (Cortex-M7) ·
 HAL for peripherals · gtest-tested protocol layer (host side)
 
 ## Layout
